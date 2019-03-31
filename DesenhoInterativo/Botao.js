@@ -33,7 +33,7 @@
 
         fontWidth = context.measureText(this.text).width;
 
-        var textX = ((((this.x + this.width) - fontWidth) - this.x) / 2) + this.x;
+		var textX = this.x + (this.width / 2) - (fontWidth / 2);
         var textY = this.y + (this.height / 2) + (this.fontSize / 2);
 
         context.fillText(text, textX, textY);
