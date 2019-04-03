@@ -8,6 +8,8 @@ const POLIGONO = 3;
 const CIRCULO = 4;
 const BEZIER = 5;
 
+objetos = [];
+
 var escolha = PONTO;
 var mouse_flag = 0;
 
