@@ -1,0 +1,10 @@
+﻿#wrapper {
+    margin: 10px;
+}
+
+#wrapper button {
+    padding: 10px;
+    font-family: "Century Gothic";
+    font-weight: bold;
+    font-size: 20px;
+}
