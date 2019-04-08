@@ -122,11 +122,20 @@ class Reta {
                     var normaThis = Norma(this.pontos[0].x, this.pontos[0].y, this.pontos[1].x, this.pontos[1].y);
 
                     var arccos = Math.acos(((produtoInterno) / (normaReta * normaThis)));
+                    var arctanreta = Math.atan2(reta.pontos[1].y - reta.pontos[0].y, reta.pontos[1].x - reta.pontos[0].x);
+                    var arctanthis = Math.atan2(this.pontos[1].y - this.pontos[0].y, this.pontos[1].x - this.pontos[0].x);
+
+                    console.log(arctanthis);
 
                     this.context.beginPath();
-                    //y = EquacaoDaReta(x, this.pontos[0].x, this.pontos[0].y, this.pontos[1].x, this.pontos[1].y);
-                    this.context.arc(x, y, 15, Math.atan2(this.pontos[1].y - this.pontos[0].y, this.pontos[1].x - this.pontos[0].x), 0);
-                    console.log(RadianoParaGrau(Math.atan2(this.pontos[1].y - this.pontos[0].y, this.pontos[1].x - this.pontos[0].x)));
+                    if (arctanthis > 0) {
+                        this.context.arc(x, y, 15, arctanthis, 0, true);
+                        this.context.arc(x, y, 15, 0, arctanreta, true);
+                    }
+                    else {
+                        this.context.arc(x, y, 15, arctanthis, 0, false);
+                        this.context.arc(x, y, 15, 0, arctanreta, false);
+                    }
                     this.context.stroke();
 
                     var anguloEmGrau = RadianoParaGrau(arccos);
