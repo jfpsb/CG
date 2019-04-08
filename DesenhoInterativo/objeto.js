@@ -24,6 +24,14 @@ function ProdutoInterno(reta, atual) {
     return (deltaX1 * deltaX2) + (deltaY1 * deltaY2);
 }
 
+function RadianoParaGrau(radianos) {
+    return (180 * radianos) / Math.PI;
+}
+
+function GrauParaRadiano(graus) {
+    return (Math.PI * graus) / 180;
+}
+
 class Ponto {
     constructor(context) {
         this.context = context;
@@ -106,10 +114,6 @@ class Reta {
 
                     this.context.fillRect(x - 1.5, y - 1.5, 3, 3);
 
-                    this.context.beginPath();
-                    this.context.arc(x, y, 15, 0, 2 * Math.PI, true);
-                    this.context.stroke();
-
                     this.context.fillStyle = "#000000";
                     this.context.strokeStyle = "#000000";
 
@@ -119,19 +123,19 @@ class Reta {
 
                     var arccos = Math.acos(((produtoInterno) / (normaReta * normaThis)));
 
-                    var angulo = (180 * arccos) / Math.PI;
+                    this.context.beginPath();
+                    //y = EquacaoDaReta(x, this.pontos[0].x, this.pontos[0].y, this.pontos[1].x, this.pontos[1].y);
+                    this.context.arc(x, y, 15, Math.atan2(this.pontos[1].y - this.pontos[0].y, this.pontos[1].x - this.pontos[0].x), 0);
+                    console.log(RadianoParaGrau(Math.atan2(this.pontos[1].y - this.pontos[0].y, this.pontos[1].x - this.pontos[0].x)));
+                    this.context.stroke();
 
-                    this.context.fillStyle = "#FF0000";
-
-                    var angulo2 = 180 - angulo;
-
-                    angulo2 = (Math.PI / 180) * angulo;
+                    var anguloEmGrau = RadianoParaGrau(arccos);
 
                     //x += Math.cos(angulo2) * 15;
                     //y = m2 * x + b2;
 
                     this.context.font = "12px Arial";
-                    this.context.fillText(angulo.toFixed(0), x, y);
+                    this.context.fillText(anguloEmGrau.toFixed(0), x, y);
 
                     this.context.fillStyle = "#000000";
                 }
@@ -207,14 +211,14 @@ class Circulo {
 
     draw() {
         this.context.beginPath();
-        this.raio = Math.sqrt(Math.pow(this.pontos[1].x - this.pontos[0].x, 2) + Math.pow(this.pontos[1].y - this.pontos[0].y, 2));
+        this.raio = Norma(this.pontos[0].x, this.pontos[0].y, this.pontos[1].x, this.pontos[1].y);
         this.context.arc(this.pontos[0].x, this.pontos[0].y, this.raio, 0, 2 * Math.PI);
         this.context.fill();
     }
 
     drawPreview(x, y) {
         this.context.beginPath();
-        this.raio = Math.sqrt(Math.pow(x - this.pontos[0].x, 2) + Math.pow(y - this.pontos[0].y, 2));
+        this.raio = Norma(this.pontos[0].x, this.pontos[0].y, x, y);
         this.context.arc(this.pontos[0].x, this.pontos[0].y, this.raio, 0, 2 * Math.PI);
         this.context.stroke();
     }
