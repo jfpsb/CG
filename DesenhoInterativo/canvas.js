@@ -38,8 +38,8 @@ canvas.onmousedown = function (evento) {
             }
             else {
                 objeto.adicionaPonto(mouse_x, mouse_y);
+                objeto.draw(objetos);
                 objetos.push(objeto);
-                objeto.draw();
                 mouse_flag = 0;
             }
             break;
@@ -119,7 +119,7 @@ function redraw() {
     var i;
 
     for (i = 0; i < Object.keys(objetos).length; i++) {
-        objetos[i].draw();
+        objetos[i].draw(objetos);
     }
 }
 
@@ -150,4 +150,8 @@ function BotaoClicado(nome) {
     }
 
     mouse_flag = 0;
+}
+
+function EquacaoDaReta(x, x1, y1, x2, y2) {
+    return (((x - x1) * (y2 - y1)) / (x2 - x1)) + y1;
 }
