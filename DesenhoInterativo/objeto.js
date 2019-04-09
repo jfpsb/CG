@@ -107,8 +107,9 @@ class Reta {
                 var menorXThis = Math.min(this.pontos[0].x, this.pontos[1].x);
                 var maiorXThis = Math.max(this.pontos[0].x, this.pontos[1].x);
 
-                if (y > menorYReta && y < maiorYReta && x > menorXReta && x < maiorXReta
-                    && y > menorYThis && y < maiorYThis && x > menorXThis && x < maiorXThis) {
+                if (y >= menorYReta && y < maiorYReta && x >= menorXReta && x < maiorXReta
+                    && y >= menorYThis && y < maiorYThis && x >= menorXThis && x < maiorXThis) {
+                    console.log("ALOU");
                     this.context.fillStyle = "#FF0000";
                     this.context.strokeStyle = "#FF0000";
 
@@ -125,23 +126,9 @@ class Reta {
                     var arctanreta = Math.atan2(reta.pontos[1].y - reta.pontos[0].y, reta.pontos[1].x - reta.pontos[0].x);
                     var arctanthis = Math.atan2(this.pontos[1].y - this.pontos[0].y, this.pontos[1].x - this.pontos[0].x);
 
-                    console.log(arctanthis);
-
-                    this.context.beginPath();
-                    if (arctanthis > 0) {
-                        this.context.arc(x, y, 15, arctanthis, 0, true);
-                        this.context.arc(x, y, 15, 0, arctanreta, true);
-                    }
-                    else {
-                        this.context.arc(x, y, 15, arctanthis, 0, false);
-                        this.context.arc(x, y, 15, 0, arctanreta, false);
-                    }
-                    this.context.stroke();
+                    this.drawArco(x, y, arctanreta, arctanthis);
 
                     var anguloEmGrau = RadianoParaGrau(arccos);
-
-                    //x += Math.cos(angulo2) * 15;
-                    //y = m2 * x + b2;
 
                     this.context.font = "12px Arial";
                     this.context.fillText(anguloEmGrau.toFixed(0), x, y);
@@ -159,6 +146,121 @@ class Reta {
         this.context.moveTo(this.pontos[0].x, this.pontos[0].y);
         this.context.lineTo(x, y);
         this.context.stroke();
+    }
+
+    drawArco(x, y, arctanreta, arctanthis) {
+        var angarctanreta = RadianoParaGrau(arctanreta);
+        var angarctanthis = RadianoParaGrau(arctanthis);
+
+        this.context.strokeStyle = "#FF0000";
+
+        this.context.beginPath();
+
+        //Se linha já desenhada estiver no 1º quadrante
+        if (angarctanreta > -90 && angarctanreta < 0) {
+            //Se linha sendo desenhada estiver no 3º ou 4º quadrantes
+            if (angarctanthis > 0) {
+                if (angarctanthis > 90) {
+                    this.context.arc(x, y, 20, arctanreta, arctanthis, true);
+                }
+                else {
+                    this.context.arc(x, y, 20, arctanreta, arctanthis);
+                }
+            }
+            //Se as duas linhas estiverem no 1º ou 2º quadrantes
+            else {
+                //Se reta já desenhada estiver à esquerda
+                if (angarctanreta < angarctanthis) {
+                    //Desenha da reta já desenhada em sentido horário
+                    this.context.arc(x, y, 20, arctanreta, arctanthis);
+                }
+                else {
+                    //Desenha da reta já desenhada em sentido anti horário
+                    this.context.arc(x, y, 20, arctanreta, arctanthis, true);
+                }
+            }
+        }
+        //Se linha já desenhada estiver no 2º quadrante
+        else if (angarctanreta < -90 && angarctanreta > -180) {
+            //Se linha sendo desenhada estiver no 3º ou 4º quadrantes
+            if (angarctanthis > 0) {
+                if (angarctanthis < 90) {
+                    this.context.arc(x, y, 20, arctanreta, arctanthis);
+                }
+                else {
+                    this.context.arc(x, y, 20, arctanreta, arctanthis, true);
+                }
+            }
+            //Se as duas linhas estiverem no 1º ou 2º quadrantes
+            else {
+                //Se reta já desenhada estiver à esquerda
+                if (angarctanreta < angarctanthis) {
+                    //Desenha a partir da reta já desenhada em sentido horário
+                    this.context.arc(x, y, 20, arctanreta, arctanthis);
+                }
+                else {
+                    //Desenha da reta já desenhada em sentido anti horário
+                    this.context.arc(x, y, 20, arctanreta, arctanthis, true);
+                }
+            }
+        }
+        //Se linha já desenhada estiver no 3º quadrante
+        else if (angarctanreta > 90 && angarctanreta < 180) {
+            //Se linha sendo desenhada estiver no 1º ou 2º quadrantes
+            if (angarctanthis < 0) {
+                if (angarctanthis > -90) {
+                    this.context.arc(x, y, 20, arctanreta, arctanthis, true);
+                }
+                else {
+                    this.context.arc(x, y, 20, arctanreta, arctanthis);
+                }
+            }
+            //Se as duas linhas estiverem no 3º ou 4º quadrantes
+            else {
+                //Se ângulo da reta já desenhada em relação ao eixo x for maior que da nova linha
+                if (angarctanreta > angarctanthis) {
+                    //Desenha a partir da reta já desenhada em sentido anti horário
+                    this.context.arc(x, y, 20, arctanreta, arctanthis, true);
+                }
+                else {
+                    //Desenha da reta já desenhada em sentido horário
+                    this.context.arc(x, y, 20, arctanreta, arctanthis);
+                }
+            }
+        }
+        //Se linha já desenhada estiver no 4º quadrante
+        else if (angarctanreta > 0 && angarctanreta < 90) {
+            //Se linha sendo desenhada estiver no 1º ou 2º quadrantes
+            if (angarctanthis < 0) {
+                this.context.arc(x, y, 20, arctanreta, arctanthis, true);
+            }
+            //Se as duas linhas estiverem no 3º ou 4º quadrantes
+            else {
+                //Se ângulo da linha já desenhada em relação ao eixo x for maior que da nova linha
+                if (angarctanreta > angarctanthis) {
+                    //Desenha a partir da reta já desenhada em sentido anti horário
+                    this.context.arc(x, y, 20, arctanreta, arctanthis, true);
+                }
+                else {
+                    //Desenha da reta já desenhada em sentido anti horário
+                    this.context.arc(x, y, 20, arctanreta, arctanthis);
+                }
+            }
+        }
+        //Se forem perpendiculares
+        else {
+            if ((angarctanreta == 0 && angarctanthis == -90) || (angarctanreta == -90 && angarctanthis == 0)
+                || (angarctanreta == -180 && angarctanthis == 90) || (angarctanreta == 90 && angarctanthis == -180)) {
+                this.context.arc(x, y, 20, arctanreta, arctanthis);
+            }
+            else {
+                this.context.arc(x, y, 20, arctanreta, arctanthis, true);
+            }
+        }
+
+        this.context.stroke();
+
+        this.context.strokeStyle = "#000000";
     }
 }
 
