@@ -42,6 +42,8 @@ class Ponto {
     }
 
     draw() {
+        this.context.fillStyle = "#000000";
+        this.context.strokeStyle = "#000000";
         this.context.fillRect(this.ponto.x, this.ponto.y, 2, 2);
     }
 }
@@ -60,6 +62,7 @@ class Reta {
         this.context.fillStyle = "#000000";
         this.context.strokeStyle = "#000000";
 
+        //Desenho linha em canvas
         this.context.beginPath();
         this.context.moveTo(this.pontos[0].x, this.pontos[0].y);
         this.context.lineTo(this.pontos[1].x, this.pontos[1].y);
@@ -68,39 +71,44 @@ class Reta {
         this.context.fillStyle = "#FF0000";
         this.context.strokeStyle = "#FF0000";
 
+        //Desenho um ponto vermelho para indicar o começo da linha
         this.context.fillRect(this.pontos[0].x - 1.5, this.pontos[0].y - 1.5, 3, 3);
 
         this.context.fillStyle = "#008000";
-        this.context.fillRect(this.pontos[1].x - 1.5, this.pontos[1].y - 1.5, 3, 3);
 
-        this.context.fillStyle = "#000000";
+        //Desenho um ponto verde para indicar o fim da linha
+        this.context.fillRect(this.pontos[1].x - 1.5, this.pontos[1].y - 1.5, 3, 3);
 
         var i;
 
         for (i = 0; i < objetos.length; i++) {
             if (objetos[i] instanceof Reta) {
-                var reta = objetos[i];
+                var linhaDesenhada = objetos[i];
 
-                if (reta.pontos[0].x == this.pontos[0].x
-                    && reta.pontos[0].y == this.pontos[0].y
-                    && reta.pontos[1].x == this.pontos[1].x
-                    && reta.pontos[1].y == this.pontos[1].y) {
+                //Se a linha já desenhada estiver exatamente na mesma posição da linha sendo desenhada
+                if (linhaDesenhada.pontos[0].x == this.pontos[0].x
+                    && linhaDesenhada.pontos[0].y == this.pontos[0].y
+                    && linhaDesenhada.pontos[1].x == this.pontos[1].x
+                    && linhaDesenhada.pontos[1].y == this.pontos[1].y) {
                     break;
                 }
 
-                var b1 = EquacaoDaReta(0, reta.pontos[0].x, reta.pontos[0].y, reta.pontos[1].x, reta.pontos[1].y);
+                var b1 = EquacaoDaReta(0, linhaDesenhada.pontos[0].x, linhaDesenhada.pontos[0].y, linhaDesenhada.pontos[1].x, linhaDesenhada.pontos[1].y);
                 var b2 = EquacaoDaReta(0, this.pontos[0].x, this.pontos[0].y, this.pontos[1].x, this.pontos[1].y);
 
-                var m1 = (reta.pontos[1].y - reta.pontos[0].y) / (reta.pontos[1].x - reta.pontos[0].x);
+                //Coeficiente angular da linha já desenhada
+                var m1 = (linhaDesenhada.pontos[1].y - linhaDesenhada.pontos[0].y) / (linhaDesenhada.pontos[1].x - linhaDesenhada.pontos[0].x);
+                //Coeficiente angular da linha sendo desenhada
                 var m2 = (this.pontos[1].y - this.pontos[0].y) / (this.pontos[1].x - this.pontos[0].x);
 
                 var x = (b2 - b1) / (m1 - m2);
-                var y = m1 * x + b1;
+                var y = m1 * x + b1; //Equação reduzida reta
 
-                var menorYReta = Math.min(reta.pontos[0].y, reta.pontos[1].y);
-                var maiorYReta = Math.max(reta.pontos[0].y, reta.pontos[1].y);
-                var menorXReta = Math.min(reta.pontos[0].x, reta.pontos[1].x);
-                var maiorXReta = Math.max(reta.pontos[0].x, reta.pontos[1].x);
+                //Coordenadas das "caixas" das linhas
+                var menorYReta = Math.min(linhaDesenhada.pontos[0].y, linhaDesenhada.pontos[1].y);
+                var maiorYReta = Math.max(linhaDesenhada.pontos[0].y, linhaDesenhada.pontos[1].y);
+                var menorXReta = Math.min(linhaDesenhada.pontos[0].x, linhaDesenhada.pontos[1].x);
+                var maiorXReta = Math.max(linhaDesenhada.pontos[0].x, linhaDesenhada.pontos[1].x);
 
                 var menorYThis = Math.min(this.pontos[0].y, this.pontos[1].y);
                 var maiorYThis = Math.max(this.pontos[0].y, this.pontos[1].y);
@@ -109,7 +117,6 @@ class Reta {
 
                 if (y >= menorYReta && y < maiorYReta && x >= menorXReta && x < maiorXReta
                     && y >= menorYThis && y < maiorYThis && x >= menorXThis && x < maiorXThis) {
-                    console.log("ALOU");
                     this.context.fillStyle = "#FF0000";
                     this.context.strokeStyle = "#FF0000";
 
@@ -118,12 +125,15 @@ class Reta {
                     this.context.fillStyle = "#000000";
                     this.context.strokeStyle = "#000000";
 
-                    var produtoInterno = ProdutoInterno(reta.pontos, this.pontos);
-                    var normaReta = Norma(reta.pontos[0].x, reta.pontos[0].y, reta.pontos[1].x, reta.pontos[1].y);
+                    var produtoInterno = ProdutoInterno(linhaDesenhada.pontos, this.pontos);
+                    var normaReta = Norma(linhaDesenhada.pontos[0].x, linhaDesenhada.pontos[0].y, linhaDesenhada.pontos[1].x, linhaDesenhada.pontos[1].y);
                     var normaThis = Norma(this.pontos[0].x, this.pontos[0].y, this.pontos[1].x, this.pontos[1].y);
 
+                    //Tamanho do arco entre uma linha e outra
                     var arccos = Math.acos(((produtoInterno) / (normaReta * normaThis)));
-                    var arctanreta = Math.atan2(reta.pontos[1].y - reta.pontos[0].y, reta.pontos[1].x - reta.pontos[0].x);
+                    //ângulo em radianos da reta já desenhada até o eixo x
+                    var arctanreta = Math.atan2(linhaDesenhada.pontos[1].y - linhaDesenhada.pontos[0].y, linhaDesenhada.pontos[1].x - linhaDesenhada.pontos[0].x);
+                    //ângulo em radianos da reta sendo desenhada até o eixo x
                     var arctanthis = Math.atan2(this.pontos[1].y - this.pontos[0].y, this.pontos[1].x - this.pontos[0].x);
 
                     this.drawArco(x, y, arctanreta, arctanthis);
@@ -151,6 +161,7 @@ class Reta {
     drawArco(x, y, arctanreta, arctanthis) {
         var angarctanreta = RadianoParaGrau(arctanreta);
         var angarctanthis = RadianoParaGrau(arctanthis);
+        var radius = 15;
 
         this.context.strokeStyle = "#FF0000";
 
@@ -160,11 +171,12 @@ class Reta {
         if (angarctanreta > -90 && angarctanreta < 0) {
             //Se linha sendo desenhada estiver no 3º ou 4º quadrantes
             if (angarctanthis > 0) {
-                if (angarctanthis > 90) {
-                    this.context.arc(x, y, 20, arctanreta, arctanthis, true);
+                var anguloSuplementar = 180 - Math.abs(angarctanreta);
+                if (angarctanthis <= anguloSuplementar) {
+                    this.context.arc(x, y, radius, arctanreta, arctanthis);
                 }
                 else {
-                    this.context.arc(x, y, 20, arctanreta, arctanthis);
+                    this.context.arc(x, y, radius, arctanreta, arctanthis, true);
                 }
             }
             //Se as duas linhas estiverem no 1º ou 2º quadrantes
@@ -172,11 +184,11 @@ class Reta {
                 //Se reta já desenhada estiver à esquerda
                 if (angarctanreta < angarctanthis) {
                     //Desenha da reta já desenhada em sentido horário
-                    this.context.arc(x, y, 20, arctanreta, arctanthis);
+                    this.context.arc(x, y, radius, arctanreta, arctanthis);
                 }
                 else {
                     //Desenha da reta já desenhada em sentido anti horário
-                    this.context.arc(x, y, 20, arctanreta, arctanthis, true);
+                    this.context.arc(x, y, radius, arctanreta, arctanthis, true);
                 }
             }
         }
@@ -184,11 +196,12 @@ class Reta {
         else if (angarctanreta < -90 && angarctanreta > -180) {
             //Se linha sendo desenhada estiver no 3º ou 4º quadrantes
             if (angarctanthis > 0) {
-                if (angarctanthis < 90) {
-                    this.context.arc(x, y, 20, arctanreta, arctanthis);
+                var anguloSuplementar = 180 - Math.abs(angarctanreta);
+                if (angarctanthis <= anguloSuplementar) {
+                    this.context.arc(x, y, radius, arctanreta, arctanthis);
                 }
                 else {
-                    this.context.arc(x, y, 20, arctanreta, arctanthis, true);
+                    this.context.arc(x, y, radius, arctanreta, arctanthis, true);
                 }
             }
             //Se as duas linhas estiverem no 1º ou 2º quadrantes
@@ -196,11 +209,11 @@ class Reta {
                 //Se reta já desenhada estiver à esquerda
                 if (angarctanreta < angarctanthis) {
                     //Desenha a partir da reta já desenhada em sentido horário
-                    this.context.arc(x, y, 20, arctanreta, arctanthis);
+                    this.context.arc(x, y, radius, arctanreta, arctanthis);
                 }
                 else {
                     //Desenha da reta já desenhada em sentido anti horário
-                    this.context.arc(x, y, 20, arctanreta, arctanthis, true);
+                    this.context.arc(x, y, radius, arctanreta, arctanthis, true);
                 }
             }
         }
@@ -208,11 +221,12 @@ class Reta {
         else if (angarctanreta > 90 && angarctanreta < 180) {
             //Se linha sendo desenhada estiver no 1º ou 2º quadrantes
             if (angarctanthis < 0) {
-                if (angarctanthis > -90) {
-                    this.context.arc(x, y, 20, arctanreta, arctanthis, true);
+                var anguloSuplementar = (180 - angarctanreta) * (-1);
+                if (angarctanthis <= anguloSuplementar) {
+                    this.context.arc(x, y, radius, arctanreta, arctanthis);
                 }
                 else {
-                    this.context.arc(x, y, 20, arctanreta, arctanthis);
+                    this.context.arc(x, y, radius, arctanreta, arctanthis, true);
                 }
             }
             //Se as duas linhas estiverem no 3º ou 4º quadrantes
@@ -220,11 +234,11 @@ class Reta {
                 //Se ângulo da reta já desenhada em relação ao eixo x for maior que da nova linha
                 if (angarctanreta > angarctanthis) {
                     //Desenha a partir da reta já desenhada em sentido anti horário
-                    this.context.arc(x, y, 20, arctanreta, arctanthis, true);
+                    this.context.arc(x, y, radius, arctanreta, arctanthis, true);
                 }
                 else {
                     //Desenha da reta já desenhada em sentido horário
-                    this.context.arc(x, y, 20, arctanreta, arctanthis);
+                    this.context.arc(x, y, radius, arctanreta, arctanthis);
                 }
             }
         }
@@ -232,35 +246,29 @@ class Reta {
         else if (angarctanreta > 0 && angarctanreta < 90) {
             //Se linha sendo desenhada estiver no 1º ou 2º quadrantes
             if (angarctanthis < 0) {
-                this.context.arc(x, y, 20, arctanreta, arctanthis, true);
+                var anguloSuplementar = (180 - angarctanreta) * (-1);
+                if (angarctanthis <= anguloSuplementar) {
+                    this.context.arc(x, y, radius, arctanreta, arctanthis);
+                }
+                else {
+                    this.context.arc(x, y, radius, arctanreta, arctanthis, true);
+                }
             }
             //Se as duas linhas estiverem no 3º ou 4º quadrantes
             else {
                 //Se ângulo da linha já desenhada em relação ao eixo x for maior que da nova linha
                 if (angarctanreta > angarctanthis) {
                     //Desenha a partir da reta já desenhada em sentido anti horário
-                    this.context.arc(x, y, 20, arctanreta, arctanthis, true);
+                    this.context.arc(x, y, radius, arctanreta, arctanthis, true);
                 }
                 else {
                     //Desenha da reta já desenhada em sentido anti horário
-                    this.context.arc(x, y, 20, arctanreta, arctanthis);
+                    this.context.arc(x, y, radius, arctanreta, arctanthis);
                 }
-            }
-        }
-        //Se forem perpendiculares
-        else {
-            if ((angarctanreta == 0 && angarctanthis == -90) || (angarctanreta == -90 && angarctanthis == 0)
-                || (angarctanreta == -180 && angarctanthis == 90) || (angarctanreta == 90 && angarctanthis == -180)) {
-                this.context.arc(x, y, 20, arctanreta, arctanthis);
-            }
-            else {
-                this.context.arc(x, y, 20, arctanreta, arctanthis, true);
             }
         }
 
         this.context.stroke();
-
-        this.context.strokeStyle = "#000000";
     }
 }
 
@@ -275,6 +283,9 @@ class Poligono {
     }
 
     draw() {
+        this.context.fillStyle = "#000000";
+        this.context.strokeStyle = "#000000";
+
         this.context.beginPath();
         this.context.moveTo(this.pontos[0].x, this.pontos[0].y);
 
@@ -290,6 +301,9 @@ class Poligono {
     }
 
     drawPreview(x, y) {
+        this.context.fillStyle = "#000000";
+        this.context.strokeStyle = "#000000";
+
         this.context.beginPath();
         this.context.moveTo(this.pontos[0].x, this.pontos[0].y);
 
@@ -302,8 +316,6 @@ class Poligono {
         this.context.lineTo(x, y);
 
         this.context.closePath(); //Conecta primeiro ponto com o último
-
-
 
         this.context.stroke();
     }
@@ -321,6 +333,9 @@ class Circulo {
     }
 
     draw() {
+        this.context.fillStyle = "#000000";
+        this.context.strokeStyle = "#000000";
+
         this.context.beginPath();
         this.raio = Norma(this.pontos[0].x, this.pontos[0].y, this.pontos[1].x, this.pontos[1].y);
         this.context.arc(this.pontos[0].x, this.pontos[0].y, this.raio, 0, 2 * Math.PI);
@@ -328,6 +343,9 @@ class Circulo {
     }
 
     drawPreview(x, y) {
+        this.context.fillStyle = "#000000";
+        this.context.strokeStyle = "#000000";
+
         this.context.beginPath();
         this.raio = Norma(this.pontos[0].x, this.pontos[0].y, x, y);
         this.context.arc(this.pontos[0].x, this.pontos[0].y, this.raio, 0, 2 * Math.PI);
@@ -346,6 +364,9 @@ class CurvaDeBezier {
     }
 
     draw() {
+        this.context.fillStyle = "#000000";
+        this.context.strokeStyle = "#000000";
+
         this.context.beginPath();
         this.context.moveTo(this.pontos[0].x, this.pontos[0].y);
         this.context.bezierCurveTo(this.pontos[1].x, this.pontos[1].y, this.pontos[2].x, this.pontos[2].y, this.pontos[3].x, this.pontos[3].y);
@@ -353,6 +374,9 @@ class CurvaDeBezier {
     }
 
     drawPreview(x, y) {
+        this.context.fillStyle = "#000000";
+        this.context.strokeStyle = "#000000";
+
         if (Object.keys(this.pontos).length == 3) {
             this.context.beginPath();
             this.context.moveTo(this.pontos[0].x, this.pontos[0].y);
