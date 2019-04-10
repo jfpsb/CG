@@ -341,6 +341,9 @@ class Circulo {
         this.raio = Norma(this.pontos[0].x, this.pontos[0].y, this.pontos[1].x, this.pontos[1].y);
         this.context.arc(this.pontos[0].x, this.pontos[0].y, this.raio, 0, 2 * Math.PI);
         this.context.fill();
+
+        this.context.strokeStyle = "#FFFFFF";
+        this.context.stroke();
     }
 
     drawPreview(x, y) {
@@ -351,6 +354,33 @@ class Circulo {
         this.raio = Norma(this.pontos[0].x, this.pontos[0].y, x, y);
         this.context.arc(this.pontos[0].x, this.pontos[0].y, this.raio, 0, 2 * Math.PI);
         this.context.stroke();
+    }
+
+    drawSelection() {
+        console.log("TESTE");
+        this.context.fillStyle = "rgba(0, 0, 255, 0.4)"; //Azul
+
+        this.context.beginPath();
+        this.raio = Norma(this.pontos[0].x, this.pontos[0].y, this.pontos[1].x, this.pontos[1].y);
+        this.context.arc(this.pontos[0].x, this.pontos[0].y, this.raio, 0, 2 * Math.PI);
+        this.context.fill();
+
+        this.context.strokeStyle = "#FFFFFF";
+        this.context.stroke();
+    }
+
+    clicado(x, y) {
+        var distanciaAteCentro = Norma(this.pontos[0].x, this.pontos[0].y, x, y);
+
+        if (distanciaAteCentro > this.raio) {
+            return false;
+        }
+
+        return true;
+    }
+
+    area() {
+        return (Math.PI * (Math.pow(this.raio, 2))).toFixed(2);
     }
 }
 

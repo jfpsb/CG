@@ -7,9 +7,12 @@ const RETA = 2;
 const POLIGONO = 3;
 const CIRCULO = 4;
 const BEZIER = 5;
+const PINTAR = 6;
+const AREA = 7;
 
 var objeto;
-objetos = [];
+var objetos = [];
+var i;
 
 var escolha = PONTO;
 var mouse_flag = 0;
@@ -97,6 +100,24 @@ canvas.onmousedown = function (evento) {
                 }
             }
             break;
+        case AREA:
+            var clicado;
+
+            for (i = Object.keys(objetos).length - 1; i >= 0; i--) {
+                var obj = objetos[i];
+                if (obj.clicado(mouse_x, mouse_y)) {
+                    obj.drawSelection();
+                    clicado = obj;
+                    break;
+                }
+            }
+
+            //Alert é atrasado em 20ms para dar tempo de drawSelection ser executado
+            if (clicado instanceof Circulo) {
+                setTimeout(function () {
+                    alert("A área em pixels² da circunferência clicada é: " + clicado.area());
+                }, 20);
+            }
     }
 }
 
@@ -115,8 +136,6 @@ canvas.onmousemove = function (evento) {
 
 function redraw() {
     context.clearRect(0, 0, canvas.width, canvas.height);
-
-    var i;
 
     for (i = 0; i < Object.keys(objetos).length; i++) {
         objetos[i].draw(objetos);
@@ -142,6 +161,9 @@ function BotaoClicado(nome) {
         case "bezier":
             escolha = BEZIER;
             break;
+        case "area":
+            escolha = AREA;
+            break;
         default:
             objeto = null;
             objetos = [];
@@ -150,8 +172,4 @@ function BotaoClicado(nome) {
     }
 
     mouse_flag = 0;
-}
-
-function EquacaoDaReta(x, x1, y1, x2, y2) {
-    return (((x - x1) * (y2 - y1)) / (x2 - x1)) + y1;
 }
