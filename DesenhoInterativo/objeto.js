@@ -120,6 +120,7 @@ class Reta {
                     this.context.fillStyle = "#FF0000";
                     this.context.strokeStyle = "#FF0000";
 
+                    //Desenha ponto vermelho na interseção das linhas
                     this.context.fillRect(x - 1.5, y - 1.5, 3, 3);
 
                     this.context.fillStyle = "#000000";
@@ -161,7 +162,7 @@ class Reta {
     drawArco(x, y, arctanreta, arctanthis) {
         var angarctanreta = RadianoParaGrau(arctanreta);
         var angarctanthis = RadianoParaGrau(arctanthis);
-        var radius = 15;
+        var radius = 20;
 
         this.context.strokeStyle = "#FF0000";
 
