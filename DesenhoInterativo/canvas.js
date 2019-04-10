@@ -17,6 +17,13 @@ var i;
 var escolha = PONTO;
 var mouse_flag = 0;
 
+objeto = new Poligono(context);
+objeto.adicionaPonto(0, 0);
+objeto.adicionaPonto(0, 200);
+objeto.adicionaPonto(400, 200);
+objeto.adicionaPonto(400, 0);
+objetos.push(objeto);
+
 canvas.onmousedown = function (evento) {
     var rect = canvas.getBoundingClientRect();
 

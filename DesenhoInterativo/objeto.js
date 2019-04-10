@@ -271,6 +271,17 @@ class Reta {
 
         this.context.stroke();
     }
+
+    clicado(x, y) {
+        var TOL = 3; //3 pixels
+        var xmin = x - TOL, xmax = x + TOL, ymin = y - TOL, ymax = y + TOL;
+
+
+    }
+
+    pickCode(x, y, xmin, xmax, ymin, ymax) {
+
+    }
 }
 
 class Poligono {
