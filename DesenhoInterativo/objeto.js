@@ -2,6 +2,7 @@ class Coordenada {
     constructor(x, y) {
         this.x = x;
         this.y = y;
+        this.z = 0;
     }
 }
 
@@ -14,6 +15,10 @@ function Norma(x1, y1, x2, y2) {
     var deltaX = Math.abs(x2 - x1);
     var deltaY = Math.abs(y2 - y1);
     return Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
+}
+
+function Norma(x, y, z) {
+    return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
 }
 
 function ProdutoInterno(reta, atual) {
@@ -273,13 +278,15 @@ class Reta {
     }
 
     clicado(x, y) {
-        var TOL = 3; //3 pixels
+        var TOL = 3 / 2; //A área total de tolerância são 3 pixels, mas o centro dela fica a 1,5 pixel de cada lado
         var xmin = x - TOL, xmax = x + TOL, ymin = y - TOL, ymax = y + TOL;
+        var flags = [];
 
+        flags[0] = x < xmin; //esquerda
+        flags[1] = x > xmax; //direita
+        flags[2] = y > ymax //embaixo
+        flags[3] = y < ymin; //acima
 
-    }
-
-    pickCode(x, y, xmin, xmax, ymin, ymax) {
 
     }
 }
@@ -330,6 +337,50 @@ class Poligono {
         this.context.closePath(); //Conecta primeiro ponto com o último
 
         this.context.stroke();
+    }
+
+    area() {
+        var determinantes = [];
+        var normal = [];
+        var i, j;
+
+        var pontosSize = Object.keys(this.pontos).length;
+
+        for (i = 0; i < pontosSize - 1; i++) {
+            determinantes.push(this.determinante(this.pontos[i], this.pontos[i + 1]));
+        }
+
+        determinantes.push(this.determinante(this.pontos[pontosSize - 1], this.pontos[0]));
+
+        for (i = 0; i < 3; i++) {
+            var aux = 0;
+
+            for (j = 0; j < Object.keys(determinantes).length; j++) {
+                var d = determinantes[j];
+                aux += d[i];
+            }
+
+            normal[i] = aux / 2;
+        }
+
+        return Norma(normal[0], normal[1], normal[2]);
+    }
+
+    determinante(ponto1, ponto2) {
+        var vetorResultante = [];
+
+        var i1 = ponto1.y * ponto2.z;
+        var i2 = ponto2.y * ponto1.z;
+        var j1 = ponto1.z * ponto2.x;
+        var j2 = ponto2.z * ponto1.x;
+        var k1 = ponto1.x * ponto2.y;
+        var k2 = ponto2.x * ponto1.y;
+
+        vetorResultante[0] = i1 - i2;
+        vetorResultante[1] = j1 - j2;
+        vetorResultante[2] = k1 - k2;
+
+        return vetorResultante;
     }
 }
 

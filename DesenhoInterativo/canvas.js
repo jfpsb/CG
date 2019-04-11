@@ -110,19 +110,26 @@ canvas.onmousedown = function (evento) {
         case AREA:
             var clicado;
 
-            for (i = Object.keys(objetos).length - 1; i >= 0; i--) {
-                var obj = objetos[i];
-                if (obj.clicado(mouse_x, mouse_y)) {
-                    obj.drawSelection();
-                    clicado = obj;
-                    break;
-                }
-            }
+            //for (i = Object.keys(objetos).length - 1; i >= 0; i--) {
+            //    var obj = objetos[i];
+            //    if (obj.clicado(mouse_x, mouse_y)) {
+            //        obj.drawSelection();
+            //        clicado = obj;
+            //        break;
+            //    }
+            //}
+
+            clicado = objetos[0];
 
             //Alert é atrasado em 20ms para dar tempo de drawSelection ser executado
             if (clicado instanceof Circulo) {
                 setTimeout(function () {
                     alert("A área em pixels² da circunferência clicada é: " + clicado.area());
+                }, 20);
+            }
+            else if (clicado instanceof Poligono) {
+                setTimeout(function () {
+                    alert("A área em pixels² do polígono clicado é: " + clicado.area());
                 }, 20);
             }
     }
