@@ -7,8 +7,7 @@ class Coordenada {
 }
 
 function EquacaoDaReta(x, x1, y1, x2, y2) {
-    var coeficiente = (y2 - y1) / (x2 - x1);
-    return (coeficiente * (x - x1)) + y1;
+    return (((x - x1) * (y2 - y1)) / (x2 - x1)) + y1;
 }
 
 function Norma(x1, y1, x2, y2) {
@@ -17,7 +16,7 @@ function Norma(x1, y1, x2, y2) {
     return Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
 }
 
-function Norma(x, y, z) {
+function Norma2(x, y, z) {
     return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
 }
 
@@ -40,6 +39,7 @@ function GrauParaRadiano(graus) {
 class Ponto {
     constructor(context) {
         this.context = context;
+        this.cor = "#000000";
     }
 
     adicionaPonto(x, y) {
@@ -47,8 +47,7 @@ class Ponto {
     }
 
     draw() {
-        this.context.fillStyle = "#000000";
-        this.context.strokeStyle = "#000000";
+        this.context.fillStyle = this.cor;
         this.context.fillRect(this.ponto.x, this.ponto.y, 2, 2);
     }
 }
@@ -57,6 +56,7 @@ class Reta {
     constructor(context) {
         this.pontos = [];
         this.context = context;
+        this.cor = "#000000";
     }
 
     adicionaPonto(x, y) {
@@ -64,8 +64,7 @@ class Reta {
     }
 
     draw(objetos) {
-        this.context.fillStyle = "#000000";
-        this.context.strokeStyle = "#000000";
+        this.context.strokeStyle = this.cor;
 
         //Desenho linha em canvas
         this.context.beginPath();
@@ -167,6 +166,7 @@ class Reta {
     drawArco(x, y, arctanreta, arctanthis) {
         var angarctanreta = RadianoParaGrau(arctanreta);
         var angarctanthis = RadianoParaGrau(arctanthis);
+        var sentidoHorario;
         var radius = 20;
 
         this.context.strokeStyle = "#FF0000";
@@ -280,6 +280,49 @@ class Reta {
     clicado(x, y) {
         var TOL = 3 / 2; //A área total de tolerância são 3 pixels, mas o centro dela fica a 1,5 pixel de cada lado
         var xmin = x - TOL, xmax = x + TOL, ymin = y - TOL, ymax = y + TOL;
+        var x0 = this.pontos[0].x, y0 = this.pontos[0].y, x1 = this.pontos[1].x, y1 = this.pontos[1].y;
+        var i;
+
+        var flags1 = this.pickCode(x1, y1, xmin, xmax, ymin, ymax);
+
+        do {
+            var flags0 = this.pickCode(x0, y0, xmin, xmax, ymin, ymax);
+
+            for (i = 0; i < 4; i++) {
+                if (flags0[i] && flags1[i]) {
+                    break;
+                }
+            }
+
+            if (i != 4) {
+                break;
+            }
+
+            if (flags0[0]) {
+                y0 += (xmin - x0) * (y1 - y0) / (x1 - x0);
+                x0 = xmin;
+            }
+            else if (flags0[1]) {
+                y0 += (xmax - x0) * (y1 - y0) / (x1 - x0);
+                x0 = xmax;
+            }
+            else if (flags0[2]) {
+                x0 += (ymax - y0) * (x1 - x0) / (y1 - y0);
+                y0 = ymin;
+            }
+            else if (flags0[3]) {
+                x0 += (ymax - y0) * (x1 - x0) / (y1 - y0);
+                y0 = ymax;
+            }
+            else {
+                return true;
+            }
+        } while (true);
+
+        return false;
+    }
+
+    pickCode(x, y, xmin, xmax, ymin, ymax) {
         var flags = [];
 
         flags[0] = x < xmin; //esquerda
@@ -287,7 +330,7 @@ class Reta {
         flags[2] = y > ymax //embaixo
         flags[3] = y < ymin; //acima
 
-
+        return flags;
     }
 }
 
@@ -295,6 +338,8 @@ class Poligono {
     constructor(context) {
         this.pontos = [];
         this.context = context;
+        this.cor = "#000000";
+        this.corBorda = "#FFFFFF";
     }
 
     adicionaPonto(x, y) {
@@ -302,8 +347,7 @@ class Poligono {
     }
 
     draw() {
-        this.context.fillStyle = "#000000";
-        this.context.strokeStyle = "#000000";
+        this.context.fillStyle = this.cor;
 
         this.context.beginPath();
         this.context.moveTo(this.pontos[0].x, this.pontos[0].y);
@@ -317,10 +361,12 @@ class Poligono {
         this.context.closePath(); //Conecta primeiro ponto com o último
 
         context.fill();
+
+        this.context.strokeStyle = this.corBorda;
+        this.context.stroke();
     }
 
     drawPreview(x, y) {
-        this.context.fillStyle = "#000000";
         this.context.strokeStyle = "#000000";
 
         this.context.beginPath();
@@ -363,7 +409,11 @@ class Poligono {
             normal[i] = aux / 2;
         }
 
-        return Norma(normal[0], normal[1], normal[2]);
+        return Norma2(normal[0], normal[1], normal[2]);
+    }
+
+    clicado() {
+        return false;
     }
 
     determinante(ponto1, ponto2) {
@@ -389,6 +439,8 @@ class Circulo {
         this.pontos = [];
         this.raio = 0;
         this.context = context;
+        this.cor = "#000000";
+        this.corBorda = "#FFFFFF";
     }
 
     adicionaPonto(x, y) {
@@ -396,20 +448,18 @@ class Circulo {
     }
 
     draw() {
-        this.context.fillStyle = "#000000";
-        this.context.strokeStyle = "#000000";
+        this.context.fillStyle = this.cor;
 
         this.context.beginPath();
         this.raio = Norma(this.pontos[0].x, this.pontos[0].y, this.pontos[1].x, this.pontos[1].y);
         this.context.arc(this.pontos[0].x, this.pontos[0].y, this.raio, 0, 2 * Math.PI);
         this.context.fill();
 
-        this.context.strokeStyle = "#FFFFFF";
+        this.context.strokeStyle = this.corBorda;
         this.context.stroke();
     }
 
     drawPreview(x, y) {
-        this.context.fillStyle = "#000000";
         this.context.strokeStyle = "#000000";
 
         this.context.beginPath();
@@ -419,7 +469,6 @@ class Circulo {
     }
 
     drawSelection() {
-        console.log("TESTE");
         this.context.fillStyle = "rgba(0, 0, 255, 0.4)"; //Azul
 
         this.context.beginPath();
@@ -427,7 +476,7 @@ class Circulo {
         this.context.arc(this.pontos[0].x, this.pontos[0].y, this.raio, 0, 2 * Math.PI);
         this.context.fill();
 
-        this.context.strokeStyle = "#FFFFFF";
+        this.context.strokeStyle = this.corBorda;
         this.context.stroke();
     }
 
@@ -450,6 +499,7 @@ class CurvaDeBezier {
     constructor(context) {
         this.pontos = [];
         this.context = context;
+        this.cor = "#000000";
     }
 
     adicionaPonto(x, y) {
@@ -457,8 +507,7 @@ class CurvaDeBezier {
     }
 
     draw() {
-        this.context.fillStyle = "#000000";
-        this.context.strokeStyle = "#000000";
+        this.context.strokeStyle = this.cor;
 
         this.context.beginPath();
         this.context.moveTo(this.pontos[0].x, this.pontos[0].y);
@@ -467,7 +516,6 @@ class CurvaDeBezier {
     }
 
     drawPreview(x, y) {
-        this.context.fillStyle = "#000000";
         this.context.strokeStyle = "#000000";
 
         if (Object.keys(this.pontos).length == 3) {

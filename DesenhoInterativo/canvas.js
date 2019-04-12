@@ -17,13 +17,6 @@ var i;
 var escolha = PONTO;
 var mouse_flag = 0;
 
-objeto = new Poligono(context);
-objeto.adicionaPonto(0, 0);
-objeto.adicionaPonto(0, 200);
-objeto.adicionaPonto(400, 200);
-objeto.adicionaPonto(400, 0);
-objetos.push(objeto);
-
 canvas.onmousedown = function (evento) {
     var rect = canvas.getBoundingClientRect();
 
@@ -107,19 +100,41 @@ canvas.onmousedown = function (evento) {
                 }
             }
             break;
+        case PINTAR:
+            for (i = Object.keys(objetos).length - 1; i >= 0; i--) {
+                var obj = objetos[i];
+                if (typeof obj.clicado === "function") {
+                    if (obj.clicado(mouse_x, mouse_y)) {
+                        if (obj.cor == "#000000") {
+                            obj.cor = "#FFFF00";
+                        }
+                        else {
+                            obj.cor = "#000000";
+                        }
+                        redraw();
+                        break;
+                    }
+                }
+            }
+            break;
         case AREA:
-            var clicado;
+            var clicado = null;
 
-            //for (i = Object.keys(objetos).length - 1; i >= 0; i--) {
-            //    var obj = objetos[i];
-            //    if (obj.clicado(mouse_x, mouse_y)) {
-            //        obj.drawSelection();
-            //        clicado = obj;
-            //        break;
-            //    }
-            //}
+            for (i = Object.keys(objetos).length - 1; i >= 0; i--) {
+                var obj = objetos[i];
 
-            clicado = objetos[0];
+                if (obj instanceof Reta
+                    || obj instanceof Ponto
+                    || obj instanceof CurvaDeBezier) {
+                    continue;
+                }
+
+                if (obj.clicado(mouse_x, mouse_y)) {
+                    obj.drawSelection();
+                    clicado = obj;
+                    break;
+                }
+            }
 
             //Alert é atrasado em 20ms para dar tempo de drawSelection ser executado
             if (clicado instanceof Circulo) {
@@ -132,6 +147,8 @@ canvas.onmousedown = function (evento) {
                     alert("A área em pixels² do polígono clicado é: " + clicado.area());
                 }, 20);
             }
+
+            break;
     }
 }
 
@@ -160,11 +177,9 @@ function BotaoClicado(nome) {
     switch (nome) {
         case "ponto":
             escolha = PONTO;
-            mouse_flag = 0;
             break;
         case "reta":
             escolha = RETA;
-            mouse_flag = 0;
             break;
         case "poligono":
             escolha = POLIGONO;
@@ -174,6 +189,9 @@ function BotaoClicado(nome) {
             break;
         case "bezier":
             escolha = BEZIER;
+            break;
+        case "pintar":
+            escolha = PINTAR;
             break;
         case "area":
             escolha = AREA;
