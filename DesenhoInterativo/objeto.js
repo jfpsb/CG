@@ -10,6 +10,10 @@ function EquacaoDaReta(x, x1, y1, x2, y2) {
     return (((x - x1) * (y2 - y1)) / (x2 - x1)) + y1;
 }
 
+function EquacaoDaReta2(y, x1, y1, x2, y2) {
+    return (((x2 - x1) * (y - y1)) / (y2 - y1)) + x1;
+}
+
 function Norma(x1, y1, x2, y2) {
     var deltaX = Math.abs(x2 - x1);
     var deltaY = Math.abs(y2 - y1);
@@ -179,10 +183,10 @@ class Reta {
             if (angarctanthis > 0) {
                 var anguloSuplementar = 180 - Math.abs(angarctanreta);
                 if (angarctanthis <= anguloSuplementar) {
-                    this.context.arc(x, y, radius, arctanreta, arctanthis);
+                    sentidoHorario = false;
                 }
                 else {
-                    this.context.arc(x, y, radius, arctanreta, arctanthis, true);
+                    sentidoHorario = true;
                 }
             }
             //Se as duas linhas estiverem no 1º ou 2º quadrantes
@@ -190,11 +194,11 @@ class Reta {
                 //Se reta já desenhada estiver à esquerda
                 if (angarctanreta < angarctanthis) {
                     //Desenha da reta já desenhada em sentido horário
-                    this.context.arc(x, y, radius, arctanreta, arctanthis);
+                    sentidoHorario = false;
                 }
                 else {
                     //Desenha da reta já desenhada em sentido anti horário
-                    this.context.arc(x, y, radius, arctanreta, arctanthis, true);
+                    sentidoHorario = true;
                 }
             }
         }
@@ -204,10 +208,10 @@ class Reta {
             if (angarctanthis > 0) {
                 var anguloSuplementar = 180 - Math.abs(angarctanreta);
                 if (angarctanthis <= anguloSuplementar) {
-                    this.context.arc(x, y, radius, arctanreta, arctanthis);
+                    sentidoHorario = false;
                 }
                 else {
-                    this.context.arc(x, y, radius, arctanreta, arctanthis, true);
+                    sentidoHorario = true;
                 }
             }
             //Se as duas linhas estiverem no 1º ou 2º quadrantes
@@ -215,11 +219,11 @@ class Reta {
                 //Se reta já desenhada estiver à esquerda
                 if (angarctanreta < angarctanthis) {
                     //Desenha a partir da reta já desenhada em sentido horário
-                    this.context.arc(x, y, radius, arctanreta, arctanthis);
+                    sentidoHorario = false;
                 }
                 else {
                     //Desenha da reta já desenhada em sentido anti horário
-                    this.context.arc(x, y, radius, arctanreta, arctanthis, true);
+                    sentidoHorario = true;
                 }
             }
         }
@@ -229,10 +233,10 @@ class Reta {
             if (angarctanthis < 0) {
                 var anguloSuplementar = (180 - angarctanreta) * (-1);
                 if (angarctanthis <= anguloSuplementar) {
-                    this.context.arc(x, y, radius, arctanreta, arctanthis);
+                    sentidoHorario = false;
                 }
                 else {
-                    this.context.arc(x, y, radius, arctanreta, arctanthis, true);
+                    sentidoHorario = true;
                 }
             }
             //Se as duas linhas estiverem no 3º ou 4º quadrantes
@@ -240,11 +244,11 @@ class Reta {
                 //Se ângulo da reta já desenhada em relação ao eixo x for maior que da nova linha
                 if (angarctanreta > angarctanthis) {
                     //Desenha a partir da reta já desenhada em sentido anti horário
-                    this.context.arc(x, y, radius, arctanreta, arctanthis, true);
+                    sentidoHorario = true;
                 }
                 else {
                     //Desenha da reta já desenhada em sentido horário
-                    this.context.arc(x, y, radius, arctanreta, arctanthis);
+                    sentidoHorario = false;
                 }
             }
         }
@@ -254,10 +258,10 @@ class Reta {
             if (angarctanthis < 0) {
                 var anguloSuplementar = (180 - angarctanreta) * (-1);
                 if (angarctanthis <= anguloSuplementar) {
-                    this.context.arc(x, y, radius, arctanreta, arctanthis);
+                    sentidoHorario = false;
                 }
                 else {
-                    this.context.arc(x, y, radius, arctanreta, arctanthis, true);
+                    sentidoHorario = true;
                 }
             }
             //Se as duas linhas estiverem no 3º ou 4º quadrantes
@@ -265,15 +269,16 @@ class Reta {
                 //Se ângulo da linha já desenhada em relação ao eixo x for maior que da nova linha
                 if (angarctanreta > angarctanthis) {
                     //Desenha a partir da reta já desenhada em sentido anti horário
-                    this.context.arc(x, y, radius, arctanreta, arctanthis, true);
+                    sentidoHorario = true;
                 }
                 else {
                     //Desenha da reta já desenhada em sentido anti horário
-                    this.context.arc(x, y, radius, arctanreta, arctanthis);
+                    sentidoHorario = false;
                 }
             }
         }
 
+        this.context.arc(x, y, radius, arctanreta, arctanthis, sentidoHorario);
         this.context.stroke();
     }
 
@@ -385,18 +390,41 @@ class Poligono {
         this.context.stroke();
     }
 
+    drawSelection() {
+        this.context.fillStyle = "rgba(0, 0, 255, 0.4)"; //Azul
+
+        this.context.beginPath();
+        this.context.moveTo(this.pontos[0].x, this.pontos[0].y);
+
+        var i;
+
+        for (i = 1; i < this.pontos.length; i++) {
+            this.context.lineTo(this.pontos[i].x, this.pontos[i].y);
+        }
+
+        this.context.closePath(); //Conecta primeiro ponto com o último
+
+        context.fill();
+
+        this.context.strokeStyle = this.corBorda;
+        this.context.stroke();
+    }
+
     area() {
         var determinantes = [];
-        var normal = [];
+        var normal = [], pontos2 = this.pontos.slice(0);
         var i, j;
 
         var pontosSize = Object.keys(this.pontos).length;
 
-        for (i = 0; i < pontosSize - 1; i++) {
-            determinantes.push(this.determinante(this.pontos[i], this.pontos[i + 1]));
-        }
+        for (i = 0; i < pontosSize; i++) {
+            if (i == pontosSize - 1) {
+                determinantes.push(this.determinante(pontos2[pontosSize - 1], pontos2[0]));
+                break;
+            }
 
-        determinantes.push(this.determinante(this.pontos[pontosSize - 1], this.pontos[0]));
+            determinantes.push(this.determinante(pontos2[i], pontos2[i + 1]));
+        }
 
         for (i = 0; i < 3; i++) {
             var aux = 0;
@@ -412,8 +440,57 @@ class Poligono {
         return Norma2(normal[0], normal[1], normal[2]);
     }
 
-    clicado() {
-        return false;
+    clicado(x, y) {
+        var i, intersecao = 0;
+        var pontosSize = Object.keys(this.pontos).length;
+
+        for (i = 0; i < pontosSize; i++) {
+            if (i == pontosSize - 1) {
+                intersecao += this.testaPontos(x, y, 0, pontosSize - 1, intersecao);
+                break;
+            }
+
+            intersecao += this.testaPontos(x, y, i, i + 1, intersecao);
+        }
+
+        if (intersecao % 2 == 0)
+            return false;
+
+        return true;
+    }
+
+    testaPontos(x, y, i, j) {
+        var xmax = Math.max(this.pontos[i].x, this.pontos[j].x);
+        var ymin = Math.min(this.pontos[i].y, this.pontos[j].y);
+        var ymax = Math.max(this.pontos[i].y, this.pontos[j].y);
+        var intersecao = 0;
+
+        if ((y > ymax) || (y < ymin) || (x > xmax) || (this.pontos[i].y == this.pontos[j].y)) {
+            return 0;
+        }
+
+        if (this.pontos[i].y == y) {
+            if ((this.pontos[i].x > x) && (this.pontos[j].y > y)) {
+                intersecao++;
+            }
+        }
+        else if (this.pontos[j].y == y) {
+            if ((this.pontos[j].x > x) && (this.pontos[i].y > y)) {
+                intersecao++;
+            }
+        }
+        else if ((this.pontos[i].x > x) && (this.pontos[j].x > x)) {
+            intersecao++;
+        }
+        else {
+            var xi = EquacaoDaReta2(y, this.pontos[i].x, this.pontos[i].y, this.pontos[j].x, this.pontos[j].y);
+
+            if (xi > x) {
+                intersecao++;
+            }
+        }
+
+        return intersecao;
     }
 
     determinante(ponto1, ponto2) {

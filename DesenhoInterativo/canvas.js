@@ -1,5 +1,4 @@
 var canvas = document.getElementById('canvas');
-
 var context = canvas.getContext('2d');
 
 const PONTO = 1;
@@ -158,8 +157,9 @@ canvas.onmousemove = function (evento) {
     mouse_x = evento.x - rect.x;
     mouse_y = evento.y - rect.y;
 
+    redraw();
+
     if (mouse_flag > 0) {
-        redraw();
         objeto.drawPreview(mouse_x, mouse_y);
     }
 }
