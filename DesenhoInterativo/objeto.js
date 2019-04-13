@@ -412,19 +412,17 @@ class Poligono {
 
     area() {
         var determinantes = [];
-        var normal = [], pontos2 = this.pontos.slice(0);
+        var normal = [];
         var i, j;
 
         var pontosSize = Object.keys(this.pontos).length;
 
         for (i = 0; i < pontosSize; i++) {
-            if (i == pontosSize - 1) {
-                determinantes.push(this.determinante(pontos2[pontosSize - 1], pontos2[0]));
-                break;
-            }
-
-            determinantes.push(this.determinante(pontos2[i], pontos2[i + 1]));
+            determinantes.push(this.determinante(this.pontos[i], this.pontos[i + 1]));
         }
+
+        //Último ponto com primeiro
+        determinantes.push(this.determinante(this.pontos[pontosSize - 1], this.pontos[0]));
 
         for (i = 0; i < 3; i++) {
             var aux = 0;
