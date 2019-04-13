@@ -417,7 +417,7 @@ class Poligono {
 
         var pontosSize = Object.keys(this.pontos).length;
 
-        for (i = 0; i < pontosSize; i++) {
+        for (i = 0; i < pontosSize - 1; i++) {
             determinantes.push(this.determinante(this.pontos[i], this.pontos[i + 1]));
         }
 
