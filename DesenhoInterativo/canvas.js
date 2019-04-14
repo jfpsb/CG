@@ -136,9 +136,7 @@ canvas.onmousedown = function (evento) {
             }
 
             if (clicado instanceof Circulo) {
-                setTimeout(function () {
-                    alerta("A área em pixels² da circunferência clicada é: " + clicado.area());
-                }, 20);
+                alerta("A área em pixels² da circunferência clicada é: " + clicado.area());
             }
             else if (clicado instanceof Poligono) {
                 alerta("A área em pixels² do polígono clicado é: " + clicado.area());
