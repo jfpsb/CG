@@ -135,16 +135,13 @@ canvas.onmousedown = function (evento) {
                 }
             }
 
-            //Alert é atrasado em 20ms para dar tempo de drawSelection ser executado
             if (clicado instanceof Circulo) {
                 setTimeout(function () {
-                    alert("A área em pixels² da circunferência clicada é: " + clicado.area());
+                    alerta("A área em pixels² da circunferência clicada é: " + clicado.area());
                 }, 20);
             }
             else if (clicado instanceof Poligono) {
-                setTimeout(function () {
-                    alert("A área em pixels² do polígono clicado é: " + clicado.area());
-                }, 20);
+                alerta("A área em pixels² do polígono clicado é: " + clicado.area());
             }
 
             break;
@@ -203,4 +200,11 @@ function BotaoClicado(nome) {
     }
 
     mouse_flag = 0;
+}
+
+function alerta(mensagem) {
+    //Atraso de 20ms na mensagem
+    setTimeout(function () {
+        alert(mensagem);
+    }, 20);
 }

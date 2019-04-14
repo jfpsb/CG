@@ -54,6 +54,17 @@ class Ponto {
         this.context.fillStyle = this.cor;
         this.context.fillRect(this.ponto.x, this.ponto.y, 2, 2);
     }
+
+    clicado(x, y) {
+        var TOL = 2;
+        var xmin = this.ponto.x, xmax = this.ponto.x + TOL, ymin = this.ponto.y, ymax = this.ponto.y + TOL;
+
+        if (x >= xmin && x <= xmax && y >= ymin && y <= ymax) {
+            return true;
+        }
+
+        return false;
+    }
 }
 
 class Reta {
@@ -89,6 +100,7 @@ class Reta {
 
         var i;
 
+        //Teste, cálculo e desenho de interseção entre linhas
         for (i = 0; i < objetos.length; i++) {
             if (objetos[i] instanceof Reta) {
                 var linhaDesenhada = objetos[i];
@@ -599,5 +611,32 @@ class CurvaDeBezier {
             this.context.bezierCurveTo(this.pontos[1].x, this.pontos[1].y, this.pontos[2].x, this.pontos[2].y, x, y);
             this.context.stroke();
         }
+    }
+
+    clicado(x, y) {
+        var t, TOL = 2;
+        var curvaXMin = Math.min(this.pontos[0].x, this.pontos[2].x, this.pontos[2].x, this.pontos[3].x)
+        var curvaXMax = Math.max(this.pontos[0].x, this.pontos[2].x, this.pontos[2].x, this.pontos[3].x)
+
+        var xmin = x - TOL, xmax = x + TOL, ymin = y - TOL, ymax = y + TOL;
+
+        for (t = 0; t <= 1; t += (1 / (curvaXMax - curvaXMin))) {
+            var xi = this.EquacaoX(t);
+            var yi = this.EquacaoY(t);
+
+            if (xi >= xmin && xi <= xmax && yi >= ymin && yi <= ymax) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    EquacaoX(t) {
+        return (Math.pow((1 - t), 3) * this.pontos[0].x) + (3 * Math.pow((1 - t), 2) * t * this.pontos[1].x) + (3 * (1 - t) * Math.pow(t, 2) * this.pontos[2].x) + (Math.pow(t, 3) * this.pontos[3].x);
+    }
+
+    EquacaoY(t) {
+        return (Math.pow((1 - t), 3) * this.pontos[0].y) + (3 * Math.pow((1 - t), 2) * t * this.pontos[1].y) + (3 * (1 - t) * Math.pow(t, 2) * this.pontos[2].y) + (Math.pow(t, 3) * this.pontos[3].y);
     }
 }
