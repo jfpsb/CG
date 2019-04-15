@@ -27,22 +27,26 @@ canvas.onmousedown = function (evento) {
 
     switch (escolha) {
         case PONTO:
-            objeto = new Ponto(context);
-            objeto.adicionaPonto(mouse_x, mouse_y);
-            objetos.push(objeto);
-            objeto.draw();
+            if (mouse_left != 2) {
+                objeto = new Ponto(context);
+                objeto.adicionaPonto(mouse_x, mouse_y);
+                objetos.push(objeto);
+                objeto.draw();
+            }
             break;
         case RETA:
-            if (mouse_flag == 0) {
-                objeto = new Reta(context);
-                objeto.adicionaPonto(mouse_x, mouse_y);
-                mouse_flag++;
-            }
-            else {
-                objeto.adicionaPonto(mouse_x, mouse_y);
-                objeto.draw(objetos);
-                objetos.push(objeto);
-                mouse_flag = 0;
+            if (mouse_left != 2) {
+                if (mouse_flag == 0) {
+                    objeto = new Reta(context);
+                    objeto.adicionaPonto(mouse_x, mouse_y);
+                    mouse_flag++;
+                }
+                else {
+                    objeto.adicionaPonto(mouse_x, mouse_y);
+                    objeto.draw(objetos);
+                    objetos.push(objeto);
+                    mouse_flag = 0;
+                }
             }
             break;
         case POLIGONO:
@@ -70,78 +74,85 @@ canvas.onmousedown = function (evento) {
             }
             break;
         case CIRCULO:
-            if (mouse_flag == 0) {
-                objeto = new Circulo(context);
-                objeto.adicionaPonto(mouse_x, mouse_y);
-                mouse_flag++;
-            }
-            else {
-                objeto.adicionaPonto(mouse_x, mouse_y);
-                objetos.push(objeto);
-                objeto.draw();
-                mouse_flag = 0;
-            }
-            break;
-        case BEZIER:
-            if (mouse_flag == 0) {
-                objeto = new CurvaDeBezier(context);
-                objeto.adicionaPonto(mouse_x, mouse_y);
-                mouse_flag++;
-            }
-            else {
-                objeto.adicionaPonto(mouse_x, mouse_y);
-                mouse_flag++;
-
-                if (mouse_flag == 4) {
+            if (mouse_left != 2) {
+                if (mouse_flag == 0) {
+                    objeto = new Circulo(context);
+                    objeto.adicionaPonto(mouse_x, mouse_y);
+                    mouse_flag++;
+                }
+                else {
+                    objeto.adicionaPonto(mouse_x, mouse_y);
                     objetos.push(objeto);
                     objeto.draw();
                     mouse_flag = 0;
                 }
             }
             break;
+        case BEZIER:
+            if (mouse_left != 2) {
+                if (mouse_flag == 0) {
+                    objeto = new CurvaDeBezier(context);
+                    objeto.adicionaPonto(mouse_x, mouse_y);
+                    mouse_flag++;
+                }
+                else {
+                    objeto.adicionaPonto(mouse_x, mouse_y);
+                    mouse_flag++;
+
+                    if (mouse_flag == 4) {
+                        objetos.push(objeto);
+                        objeto.draw();
+                        mouse_flag = 0;
+                    }
+                }
+            }
+            break;
         case PINTAR:
-            for (i = Object.keys(objetos).length - 1; i >= 0; i--) {
-                var obj = objetos[i];
-                if (typeof obj.clicado === "function") {
-                    if (obj.clicado(mouse_x, mouse_y)) {
-                        if (obj.cor == "#000000") {
-                            obj.cor = "#FFFF00";
+            if (mouse_left != 2) {
+                for (i = Object.keys(objetos).length - 1; i >= 0; i--) {
+                    var obj = objetos[i];
+                    if (typeof obj.clicado === "function") {
+                        if (obj.clicado(mouse_x, mouse_y)) {
+                            if (obj.cor == "#000000") {
+                                obj.cor = "#FFFF00";
+                            }
+                            else {
+                                obj.cor = "#000000";
+                            }
+                            redraw();
+                            break;
                         }
-                        else {
-                            obj.cor = "#000000";
-                        }
-                        redraw();
-                        break;
                     }
                 }
             }
             break;
         case AREA:
-            var clicado = null;
+            if (mouse_left != 2) {
+                var clicado = null;
 
-            for (i = Object.keys(objetos).length - 1; i >= 0; i--) {
-                var obj = objetos[i];
+                for (i = Object.keys(objetos).length - 1; i >= 0; i--) {
+                    var obj = objetos[i];
 
-                if (obj instanceof Reta
-                    || obj instanceof Ponto
-                    || obj instanceof CurvaDeBezier) {
-                    continue;
+                    if (obj instanceof Reta
+                        || obj instanceof Ponto
+                        || obj instanceof CurvaDeBezier) {
+                        continue;
+                    }
+
+                    if (obj.clicado(mouse_x, mouse_y)) {
+                        obj.drawSelection();
+                        clicado = obj;
+                        break;
+                    }
                 }
 
-                if (obj.clicado(mouse_x, mouse_y)) {
-                    obj.drawSelection();
-                    clicado = obj;
-                    break;
+                if (clicado instanceof Circulo) {
+                    alerta("A área em pixels² da circunferência clicada é: " + clicado.area());
+                }
+                else if (clicado instanceof Poligono) {
+                    alerta("A área em pixels² do polígono clicado é: " + clicado.area());
                 }
             }
-
-            if (clicado instanceof Circulo) {
-                alerta("A área em pixels² da circunferência clicada é: " + clicado.area());
-            }
-            else if (clicado instanceof Poligono) {
-                alerta("A área em pixels² do polígono clicado é: " + clicado.area());
-            }
-
             break;
     }
 }
