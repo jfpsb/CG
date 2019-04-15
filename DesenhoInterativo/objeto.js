@@ -162,7 +162,7 @@ class Reta {
                     var anguloEmGrau = RadianoParaGrau(arccos);
 
                     this.context.font = "12px Arial";
-                    this.context.fillText(anguloEmGrau.toFixed(0), x, y);
+                    this.context.fillText(anguloEmGrau.toFixed(0), x + 5, y);
 
                     this.context.fillStyle = "#000000";
                 }
@@ -454,14 +454,11 @@ class Poligono {
         var i, intersecao = 0;
         var pontosSize = Object.keys(this.pontos).length;
 
-        for (i = 0; i < pontosSize; i++) {
-            if (i == pontosSize - 1) {
-                intersecao += this.testaPontos(x, y, 0, pontosSize - 1, intersecao);
-                break;
-            }
-
+        for (i = 0; i < pontosSize - 1; i++) {
             intersecao += this.testaPontos(x, y, i, i + 1, intersecao);
         }
+
+        intersecao += this.testaPontos(x, y, 0, pontosSize - 1, intersecao);
 
         if (intersecao % 2 == 0)
             return false;
