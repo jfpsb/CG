@@ -7,20 +7,29 @@
     <link rel="stylesheet" href="estilo.css" />
 </head>
 <body oncontextmenu="return false">
-    <div id="wrapper" align="center">
-        <button onclick="BotaoClicado('ponto')">Ponto</button>
-        <button onclick="BotaoClicado('reta')">Reta</button>
-        <button onclick="BotaoClicado('poligono')">Polígono</button>
-        <button onclick="BotaoClicado('circulo')">Círculo</button>
-        <button onclick="BotaoClicado('bezier')">Curva de Bezier</button>
-        <button onclick="BotaoClicado('pintar')">Pintar</button>
-        <button onclick="BotaoClicado('area')">Área</button>
-        <button onclick="BotaoClicado('apagar')">Apagar Tudo</button>
+    <div class="wrapper" align="center">
+        <button class="botao" onclick="BotaoClicado('ponto')">Ponto</button>
+        <button class="botao" onclick="BotaoClicado('reta')">Reta</button>
+        <button class="botao" onclick="BotaoClicado('poligono')">Polígono</button>
+        <button class="botao" onclick="BotaoClicado('circulo')">Círculo</button>
+        <button class="botao" onclick="BotaoClicado('bezier')">Curva de Bezier</button>
+        <button class="botao" onclick="BotaoClicado('pintar')">Pintar</button>
+        <button class="botao" onclick="BotaoClicado('area')">Área</button>
+        <button class="botao" onclick="BotaoClicado('apagar')">Apagar Tudo</button>
+        <div id="info" class="wrapper" align="center">
+            <h2 id="info_text">Aperte Em Um Botão!</h2>
+        </div>
     </div>
-    <div align="center">
+    <div id="canvas_wrapper" class="wrapper" align="center">
         <canvas id="canvas"
                 width="1280" height="720"
                 style="border:1px solid #000000;"></canvas>
+        <div id="side_buttons">
+            <button class="botao" onclick="BotaoClicado('dragndrop')">Drag And Drop</button>
+            <button class="botao">Espelhamento</button>
+            <button class="botao">Rotação</button>
+            <button class="botao">Escalamento</button>
+        </div>
     </div>
     <script src="objeto.js"></script>
     <script src="canvas.js"></script>

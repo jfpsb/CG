@@ -40,6 +40,16 @@ function GrauParaRadiano(graus) {
     return (Math.PI * graus) / 180;
 }
 
+function translacao(x, y, pontoTranslacao, pontos, pontos2) {
+    var deltaTranslacao = new Coordenada(x - pontoTranslacao.x, y - pontoTranslacao.y);
+    var i;
+
+    for (i = 0; i < Object.keys(pontos).length; i++) {
+        pontos[i].x = pontos2[i].x + deltaTranslacao.x;
+        pontos[i].y = pontos2[i].y + deltaTranslacao.y;
+    }
+}
+
 class Ponto {
     constructor(context) {
         this.context = context;
@@ -48,6 +58,7 @@ class Ponto {
 
     adicionaPonto(x, y) {
         this.ponto = new Coordenada(x, y);
+        this.ponto2 = new Coordenada(x, y);
     }
 
     draw() {
@@ -65,17 +76,34 @@ class Ponto {
 
         return false;
     }
+
+    iniciaTranslacao(x, y) {
+        this.pontoTranslacao = new Coordenada(x, y);
+    }
+
+    executaTranslacao(x, y) {
+        var deltaTranslacao = new Coordenada(x - this.pontoTranslacao.x, y - this.pontoTranslacao.y);
+
+        this.ponto.x = this.ponto2.x + deltaTranslacao.x;
+        this.ponto.y = this.ponto2.y + deltaTranslacao.y;
+    }
+
+    finalizaTranslacao() {
+        this.ponto2 = JSON.parse(JSON.stringify(this.ponto)); //copia novos pontos
+    }
 }
 
 class Reta {
     constructor(context) {
         this.pontos = [];
+        this.pontos2 = [];
         this.context = context;
         this.cor = "#000000";
     }
 
     adicionaPonto(x, y) {
         this.pontos.push(new Coordenada(x, y));
+        this.pontos2.push(new Coordenada(x, y));
     }
 
     draw(objetos) {
@@ -349,11 +377,24 @@ class Reta {
 
         return flags;
     }
+
+    iniciaTranslacao(x, y) {
+        this.pontoTranslacao = new Coordenada(x, y);
+    }
+
+    executaTranslacao(x, y) {
+        translacao(x, y, this.pontoTranslacao, this.pontos, this.pontos2);
+    }
+
+    finalizaTranslacao() {
+        this.pontos2 = JSON.parse(JSON.stringify(this.pontos)); //copia novos pontos
+    }
 }
 
 class Poligono {
     constructor(context) {
         this.pontos = [];
+        this.pontos2 = [];
         this.context = context;
         this.cor = "#000000";
         this.corBorda = "#FFFFFF";
@@ -361,6 +402,7 @@ class Poligono {
 
     adicionaPonto(x, y) {
         this.pontos.push(new Coordenada(x, y));
+        this.pontos2.push(new Coordenada(x, y));
     }
 
     draw() {
@@ -516,11 +558,24 @@ class Poligono {
 
         return vetorResultante;
     }
+
+    iniciaTranslacao(x, y) {
+        this.pontoTranslacao = new Coordenada(x, y);
+    }
+
+    executaTranslacao(x, y) {
+        translacao(x, y, this.pontoTranslacao, this.pontos, this.pontos2);
+    }
+
+    finalizaTranslacao() {
+        this.pontos2 = JSON.parse(JSON.stringify(this.pontos)); //copia novos pontos
+    }
 }
 
 class Circulo {
     constructor(context) {
         this.pontos = [];
+        this.pontos2 = [];
         this.raio = 0;
         this.context = context;
         this.cor = "#000000";
@@ -529,6 +584,7 @@ class Circulo {
 
     adicionaPonto(x, y) {
         this.pontos.push(new Coordenada(x, y));
+        this.pontos2.push(new Coordenada(x, y));
     }
 
     draw() {
@@ -577,17 +633,31 @@ class Circulo {
     area() {
         return (Math.PI * (Math.pow(this.raio, 2))).toFixed(2);
     }
+
+    iniciaTranslacao(x, y) {
+        this.pontoTranslacao = new Coordenada(x, y);
+    }
+
+    executaTranslacao(x, y) {
+        translacao(x, y, this.pontoTranslacao, this.pontos, this.pontos2);
+    }
+
+    finalizaTranslacao() {
+        this.pontos2 = JSON.parse(JSON.stringify(this.pontos)); //copia novos pontos
+    }
 }
 
 class CurvaDeBezier {
     constructor(context) {
         this.pontos = [];
+        this.pontos2 = [];
         this.context = context;
         this.cor = "#000000";
     }
 
     adicionaPonto(x, y) {
         this.pontos.push(new Coordenada(x, y));
+        this.pontos2.push(new Coordenada(x, y));
     }
 
     draw() {
@@ -635,5 +705,17 @@ class CurvaDeBezier {
 
     EquacaoY(t) {
         return (Math.pow((1 - t), 3) * this.pontos[0].y) + (3 * Math.pow((1 - t), 2) * t * this.pontos[1].y) + (3 * (1 - t) * Math.pow(t, 2) * this.pontos[2].y) + (Math.pow(t, 3) * this.pontos[3].y);
+    }
+
+    iniciaTranslacao(x, y) {
+        this.pontoTranslacao = new Coordenada(x, y);
+    }
+
+    executaTranslacao(x, y) {
+        translacao(x, y, this.pontoTranslacao, this.pontos, this.pontos2);
+    }
+
+    finalizaTranslacao() {
+        this.pontos2 = JSON.parse(JSON.stringify(this.pontos)); //copia novos pontos
     }
 }

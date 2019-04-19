@@ -1,6 +1,8 @@
 var canvas = document.getElementById('canvas');
 var context = canvas.getContext('2d');
 
+var info_text = document.getElementById("info_text");
+
 const PONTO = 1;
 const RETA = 2;
 const POLIGONO = 3;
@@ -8,6 +10,10 @@ const CIRCULO = 4;
 const BEZIER = 5;
 const PINTAR = 6;
 const AREA = 7;
+const DRAGNDROP = 8;
+const ESPELHAMENTO = 9;
+const ROTACAO = 10;
+const ESCALAMENTO = 11;
 
 var objeto;
 var objetos = [];
@@ -154,6 +160,25 @@ canvas.onmousedown = function (evento) {
                 }
             }
             break;
+        case DRAGNDROP:
+            if (mouse_left != 2) {
+                if (mouse_flag == 0) {
+                    for (i = Object.keys(objetos).length - 1; i >= 0; i--) {
+                        objeto = objetos[i];
+
+                        if (objeto.clicado(mouse_x, mouse_y)) {
+                            objeto.iniciaTranslacao(mouse_x, mouse_y);
+                            mouse_flag = 1;
+                            break;
+                        }
+                    }
+                }
+                else {
+                    mouse_flag = 0;
+                    objeto.finalizaTranslacao();
+                }
+            }
+            break;
     }
 }
 
@@ -166,7 +191,14 @@ canvas.onmousemove = function (evento) {
     redraw();
 
     if (mouse_flag > 0) {
-        objeto.drawPreview(mouse_x, mouse_y);
+        switch (escolha) {
+            case DRAGNDROP:
+                objeto.executaTranslacao(mouse_x, mouse_y);
+                break;
+            default:
+                objeto.drawPreview(mouse_x, mouse_y);
+                break;
+        }
     }
 }
 
@@ -178,32 +210,60 @@ function redraw() {
     }
 }
 
+//TODO: Melhorar o código de mudar info
 function BotaoClicado(nome) {
     switch (nome) {
         case "ponto":
             escolha = PONTO;
+            info_text.innerHTML = "Você Está Desenhando Um Ponto";
             break;
         case "reta":
             escolha = RETA;
+            info_text.innerHTML = "Você Está Desenhando Uma Reta";
             break;
         case "poligono":
             escolha = POLIGONO;
+            info_text.innerHTML = "Você Está Desenhando Um Polígono";
             break;
         case "circulo":
             escolha = CIRCULO;
+            info_text.innerHTML = "Você Está Desenhando Um Círculo";
             break;
         case "bezier":
             escolha = BEZIER;
+            info_text.innerHTML = "Você Está Desenhando Uma Curva de Bezier";
             break;
         case "pintar":
             escolha = PINTAR;
+            if (objetos.length > 0) {
+                info_text.innerHTML = "Você Está Pintando Um Objeto";
+            }
+            else {
+                info_text.innerHTML = "Não Há Objetos Para Pintar";
+            }
             break;
         case "area":
             escolha = AREA;
+            if (objetos.length > 0) {
+                info_text.innerHTML = "Você Está Calculando a Área de um Objeto";
+            }
+            else {
+                info_text.innerHTML = "Não Há Objetos Para Calcular Área";
+            }
+            break;
+        case "dragndrop":
+            escolha = DRAGNDROP;
+            if (objetos.length > 0) {
+                info_text.innerHTML = "Você Está Mudando a Posição de um Objeto";
+            }
+            else {
+                info_text.innerHTML = "Não Há Objetos Para Mudar Posição";
+            }
             break;
         default:
             objeto = null;
             objetos = [];
+            info_text.innerHTML = "Aperte Em Um Botão!";
             context.clearRect(0, 0, canvas.width, canvas.height);
             break;
     }
