@@ -40,8 +40,8 @@ function GrauParaRadiano(graus) {
     return (Math.PI * graus) / 180;
 }
 
-function translacao(x, y, pontoTranslacao, pontos, pontos2) {
-    var deltaTranslacao = new Coordenada(x - pontoTranslacao.x, y - pontoTranslacao.y);
+function Translacao(x, y, pontoTransformacao, pontos, pontos2) {
+    var deltaTranslacao = new Coordenada(x - pontoTransformacao.x, y - pontoTransformacao.y);
     var i;
 
     for (i = 0; i < Object.keys(pontos).length; i++) {
@@ -50,55 +50,28 @@ function translacao(x, y, pontoTranslacao, pontos, pontos2) {
     }
 }
 
-class Ponto {
-    constructor(context) {
-        this.context = context;
-        this.cor = "#000000";
-    }
+function Escalamento(x, y, pontoTransformacao, pontos, pontos2) {
+    var quocienteEscalamento = new Coordenada(x / pontoTransformacao.x, y / pontoTransformacao.y);
 
-    adicionaPonto(x, y) {
-        this.ponto = new Coordenada(x, y);
-        this.ponto2 = new Coordenada(x, y);
-    }
+    var i;
 
-    draw() {
-        this.context.fillStyle = this.cor;
-        this.context.fillRect(this.ponto.x, this.ponto.y, 2, 2);
-    }
+    for (i = 0; i < Object.keys(pontos).length; i++) {
+        var offsetX = (pontos2[i].x - pontoTransformacao.x) * quocienteEscalamento.x;
+        var offsetY = (pontos2[i].y - pontoTransformacao.y) * quocienteEscalamento.y;
 
-    clicado(x, y) {
-        var TOL = 2;
-        var xmin = this.ponto.x, xmax = this.ponto.x + TOL, ymin = this.ponto.y, ymax = this.ponto.y + TOL;
-
-        if (x >= xmin && x <= xmax && y >= ymin && y <= ymax) {
-            return true;
-        }
-
-        return false;
-    }
-
-    iniciaTranslacao(x, y) {
-        this.pontoTranslacao = new Coordenada(x, y);
-    }
-
-    executaTranslacao(x, y) {
-        var deltaTranslacao = new Coordenada(x - this.pontoTranslacao.x, y - this.pontoTranslacao.y);
-
-        this.ponto.x = this.ponto2.x + deltaTranslacao.x;
-        this.ponto.y = this.ponto2.y + deltaTranslacao.y;
-    }
-
-    finalizaTranslacao() {
-        this.ponto2 = JSON.parse(JSON.stringify(this.ponto)); //copia novos pontos
+        pontos[i].x = offsetX + pontoTransformacao.x;
+        pontos[i].y = offsetY + pontoTransformacao.y;
     }
 }
 
-class Reta {
+class Objeto {
     constructor(context) {
-        this.pontos = [];
-        this.pontos2 = [];
         this.context = context;
         this.cor = "#000000";
+        this.corBorda = "#FFFFFF";
+        this.pontos = [];
+        this.pontos2 = [];
+        this.deltaTranslacao = null;
     }
 
     adicionaPonto(x, y) {
@@ -106,8 +79,77 @@ class Reta {
         this.pontos2.push(new Coordenada(x, y));
     }
 
-    draw(objetos) {
+    draw() {
+        this.context.fillStyle = this.cor;
         this.context.strokeStyle = this.cor;
+    }
+
+    drawPreview() {
+        this.context.strokeStyle = "#000000";
+    }
+
+    drawSelection() {
+        this.context.fillStyle = "rgba(0, 0, 255, 0.4)"; //Azul
+    }
+
+    clicado(x, y) {
+        console.log("Sobrescreva o método na subclasse!");
+        return false;
+    }
+
+    area() {
+        console.log("Esse objeto não calcula área!");
+        return "undefined";
+    }
+
+    iniciaTransformacao() {
+        //Argumentos são x e y
+        if (arguments.length == 2) {
+            var x = arguments[0];
+            var y = arguments[1];
+
+            this.pontoTransformacao = new Coordenada(x, y);
+        }
+        //Argumento é a reta que será usada no espelhamento
+        else {
+            this.retaTransformacao = arguments[0];
+        }
+    }
+
+    executaTranslacao(x, y) {
+        Translacao(x, y, this.pontoTransformacao, this.pontos, this.pontos2);
+    }
+
+    executaEscalamento(x, y) {
+        Escalamento(x, y, this.pontoTransformacao, this.pontos, this.pontos2);
+    }
+
+    finalizaTransformacao() {
+        this.pontos2 = JSON.parse(JSON.stringify(this.pontos)); //copia novos pontos
+    }
+}
+
+class Ponto extends Objeto {
+    draw() {
+        super.draw();
+        this.context.fillRect(this.pontos[0].x, this.pontos[0].y, 2, 2);
+    }
+
+    clicado(x, y) {
+        var TOL = 2;
+        var xmin = this.pontos[0].x, xmax = this.pontos[0].x + TOL, ymin = this.pontos[0].y, ymax = this.pontos[0].y + TOL;
+
+        if (x >= xmin && x <= xmax && y >= ymin && y <= ymax) {
+            return true;
+        }
+
+        return false;
+    }
+}
+
+class Reta extends Objeto {
+    draw(objetos) {
+        super.draw();
 
         //Desenho linha em canvas
         this.context.beginPath();
@@ -115,15 +157,13 @@ class Reta {
         this.context.lineTo(this.pontos[1].x, this.pontos[1].y);
         this.context.stroke();
 
+        //Desenho um ponto vermelho para indicar o começo da linha
         this.context.fillStyle = "#FF0000";
         this.context.strokeStyle = "#FF0000";
-
-        //Desenho um ponto vermelho para indicar o começo da linha
         this.context.fillRect(this.pontos[0].x - 1.5, this.pontos[0].y - 1.5, 3, 3);
 
-        this.context.fillStyle = "#008000";
-
         //Desenho um ponto verde para indicar o fim da linha
+        this.context.fillStyle = "#008000";
         this.context.fillRect(this.pontos[1].x - 1.5, this.pontos[1].y - 1.5, 3, 3);
 
         var i;
@@ -150,7 +190,7 @@ class Reta {
                 var m2 = (this.pontos[1].y - this.pontos[0].y) / (this.pontos[1].x - this.pontos[0].x);
 
                 var x = (b2 - b1) / (m1 - m2);
-                var y = m1 * x + b1; //Equação reduzida reta
+                var y = m1 * x + b1; //Equação reduzida da reta
 
                 //Coordenadas das "caixas" das linhas
                 var menorYReta = Math.min(linhaDesenhada.pontos[0].y, linhaDesenhada.pontos[1].y);
@@ -163,12 +203,13 @@ class Reta {
                 var menorXThis = Math.min(this.pontos[0].x, this.pontos[1].x);
                 var maiorXThis = Math.max(this.pontos[0].x, this.pontos[1].x);
 
+                //Somente desenho ângulo se a interseção estiver no espaço das caixas das retas
                 if (y >= menorYReta && y < maiorYReta && x >= menorXReta && x < maiorXReta
                     && y >= menorYThis && y < maiorYThis && x >= menorXThis && x < maiorXThis) {
-                    this.context.fillStyle = "#FF0000";
-                    this.context.strokeStyle = "#FF0000";
 
                     //Desenha ponto vermelho na interseção das linhas
+                    this.context.fillStyle = "#FF0000";
+                    this.context.strokeStyle = "#FF0000";
                     this.context.fillRect(x - 1.5, y - 1.5, 3, 3);
 
                     this.context.fillStyle = "#000000";
@@ -191,16 +232,13 @@ class Reta {
 
                     this.context.font = "12px Arial";
                     this.context.fillText(anguloEmGrau.toFixed(0), x + 5, y);
-
-                    this.context.fillStyle = "#000000";
                 }
             }
         }
     }
 
     drawPreview(x, y) {
-        this.context.strokeStyle = "#000000";
-
+        super.drawPreview();
         this.context.beginPath();
         this.context.moveTo(this.pontos[0].x, this.pontos[0].y);
         this.context.lineTo(x, y);
@@ -377,36 +415,11 @@ class Reta {
 
         return flags;
     }
-
-    iniciaTranslacao(x, y) {
-        this.pontoTranslacao = new Coordenada(x, y);
-    }
-
-    executaTranslacao(x, y) {
-        translacao(x, y, this.pontoTranslacao, this.pontos, this.pontos2);
-    }
-
-    finalizaTranslacao() {
-        this.pontos2 = JSON.parse(JSON.stringify(this.pontos)); //copia novos pontos
-    }
 }
 
-class Poligono {
-    constructor(context) {
-        this.pontos = [];
-        this.pontos2 = [];
-        this.context = context;
-        this.cor = "#000000";
-        this.corBorda = "#FFFFFF";
-    }
-
-    adicionaPonto(x, y) {
-        this.pontos.push(new Coordenada(x, y));
-        this.pontos2.push(new Coordenada(x, y));
-    }
-
+class Poligono extends Objeto {
     draw() {
-        this.context.fillStyle = this.cor;
+        super.draw();
 
         this.context.beginPath();
         this.context.moveTo(this.pontos[0].x, this.pontos[0].y);
@@ -426,7 +439,7 @@ class Poligono {
     }
 
     drawPreview(x, y) {
-        this.context.strokeStyle = "#000000";
+        super.drawPreview();
 
         this.context.beginPath();
         this.context.moveTo(this.pontos[0].x, this.pontos[0].y);
@@ -445,7 +458,7 @@ class Poligono {
     }
 
     drawSelection() {
-        this.context.fillStyle = "rgba(0, 0, 255, 0.4)"; //Azul
+        super.drawSelection();
 
         this.context.beginPath();
         this.context.moveTo(this.pontos[0].x, this.pontos[0].y);
@@ -558,40 +571,33 @@ class Poligono {
 
         return vetorResultante;
     }
-
-    iniciaTranslacao(x, y) {
-        this.pontoTranslacao = new Coordenada(x, y);
-    }
-
-    executaTranslacao(x, y) {
-        translacao(x, y, this.pontoTranslacao, this.pontos, this.pontos2);
-    }
-
-    finalizaTranslacao() {
-        this.pontos2 = JSON.parse(JSON.stringify(this.pontos)); //copia novos pontos
-    }
 }
 
-class Circulo {
-    constructor(context) {
-        this.pontos = [];
-        this.pontos2 = [];
-        this.raio = 0;
-        this.context = context;
-        this.cor = "#000000";
-        this.corBorda = "#FFFFFF";
-    }
+class Circulo extends Objeto {
+    constructor(context, raio, cor, corBorda) {
+        super(context);
 
-    adicionaPonto(x, y) {
-        this.pontos.push(new Coordenada(x, y));
-        this.pontos2.push(new Coordenada(x, y));
+        if (raio !== undefined) {
+            this.raioFixo = true;
+            this.raio = raio;
+            this.cor = cor;
+            this.corBorda = corBorda;
+        }
     }
 
     draw() {
-        this.context.fillStyle = this.cor;
+        super.draw();
 
         this.context.beginPath();
-        this.raio = Norma(this.pontos[0].x, this.pontos[0].y, this.pontos[1].x, this.pontos[1].y);
+
+        if (!(typeof this.raio === 'undefined')) {
+            this.raio = Norma(this.pontos[0].x, this.pontos[0].y, this.pontos[1].x, this.pontos[1].y);
+            //Coloco o raio da circuferência simbolizado como uma linha horizontal
+            //Ajuda no escalamento
+            this.pontos[1].x = this.pontos[0].x + this.raio;
+            this.pontos[1].y = this.pontos[0].y;
+        }
+
         this.context.arc(this.pontos[0].x, this.pontos[0].y, this.raio, 0, 2 * Math.PI);
         this.context.fill();
 
@@ -600,7 +606,7 @@ class Circulo {
     }
 
     drawPreview(x, y) {
-        this.context.strokeStyle = "#000000";
+        super.drawPreview();
 
         this.context.beginPath();
         this.raio = Norma(this.pontos[0].x, this.pontos[0].y, x, y);
@@ -609,7 +615,7 @@ class Circulo {
     }
 
     drawSelection() {
-        this.context.fillStyle = "rgba(0, 0, 255, 0.4)"; //Azul
+        super.drawSelection();
 
         this.context.beginPath();
         this.raio = Norma(this.pontos[0].x, this.pontos[0].y, this.pontos[1].x, this.pontos[1].y);
@@ -634,35 +640,20 @@ class Circulo {
         return (Math.PI * (Math.pow(this.raio, 2))).toFixed(2);
     }
 
-    iniciaTranslacao(x, y) {
-        this.pontoTranslacao = new Coordenada(x, y);
-    }
+    executaEscalamento(x, y) {
+        var quocienteEscalamento = new Coordenada(x / this.pontoTransformacao.x, y / this.pontoTransformacao.y);
 
-    executaTranslacao(x, y) {
-        translacao(x, y, this.pontoTranslacao, this.pontos, this.pontos2);
-    }
+        var offsetX = (this.pontos2[1].x - this.pontoTransformacao.x) * quocienteEscalamento.x;
+        var offsetY = (this.pontos2[1].y - this.pontoTransformacao.y) * quocienteEscalamento.y;
 
-    finalizaTranslacao() {
-        this.pontos2 = JSON.parse(JSON.stringify(this.pontos)); //copia novos pontos
+        this.pontos[1].x = offsetX + this.pontoTransformacao.x;
+        this.pontos[1].y = offsetY + this.pontoTransformacao.y;
     }
 }
 
-class CurvaDeBezier {
-    constructor(context) {
-        this.pontos = [];
-        this.pontos2 = [];
-        this.context = context;
-        this.cor = "#000000";
-    }
-
-    adicionaPonto(x, y) {
-        this.pontos.push(new Coordenada(x, y));
-        this.pontos2.push(new Coordenada(x, y));
-    }
-
+class CurvaDeBezier extends Objeto {
     draw() {
-        this.context.strokeStyle = this.cor;
-
+        super.draw();
         this.context.beginPath();
         this.context.moveTo(this.pontos[0].x, this.pontos[0].y);
         this.context.bezierCurveTo(this.pontos[1].x, this.pontos[1].y, this.pontos[2].x, this.pontos[2].y, this.pontos[3].x, this.pontos[3].y);
@@ -670,7 +661,7 @@ class CurvaDeBezier {
     }
 
     drawPreview(x, y) {
-        this.context.strokeStyle = "#000000";
+        super.drawPreview();
 
         if (Object.keys(this.pontos).length == 3) {
             this.context.beginPath();
@@ -705,17 +696,5 @@ class CurvaDeBezier {
 
     EquacaoY(t) {
         return (Math.pow((1 - t), 3) * this.pontos[0].y) + (3 * Math.pow((1 - t), 2) * t * this.pontos[1].y) + (3 * (1 - t) * Math.pow(t, 2) * this.pontos[2].y) + (Math.pow(t, 3) * this.pontos[3].y);
-    }
-
-    iniciaTranslacao(x, y) {
-        this.pontoTranslacao = new Coordenada(x, y);
-    }
-
-    executaTranslacao(x, y) {
-        translacao(x, y, this.pontoTranslacao, this.pontos, this.pontos2);
-    }
-
-    finalizaTranslacao() {
-        this.pontos2 = JSON.parse(JSON.stringify(this.pontos)); //copia novos pontos
     }
 }

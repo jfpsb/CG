@@ -167,7 +167,7 @@ canvas.onmousedown = function (evento) {
                         objeto = objetos[i];
 
                         if (objeto.clicado(mouse_x, mouse_y)) {
-                            objeto.iniciaTranslacao(mouse_x, mouse_y);
+                            objeto.iniciaTransformacao(mouse_x, mouse_y);
                             mouse_flag = 1;
                             break;
                         }
@@ -175,7 +175,26 @@ canvas.onmousedown = function (evento) {
                 }
                 else {
                     mouse_flag = 0;
-                    objeto.finalizaTranslacao();
+                    objeto.finalizaTransformacao();
+                }
+            }
+            break;
+        case ESCALAMENTO:
+            if (mouse_left != 2) {
+                if (mouse_flag == 0) {
+                    for (i = Object.keys(objetos).length - 1; i >= 0; i--) {
+                        objeto = objetos[i];
+
+                        if (objeto.clicado(mouse_x, mouse_y)) {
+                            objeto.iniciaTransformacao(mouse_x, mouse_y);
+                            mouse_flag = 1;
+                            break;
+                        }
+                    }
+                }
+                else {
+                    mouse_flag = 0;
+                    objeto.finalizaTransformacao();
                 }
             }
             break;
@@ -194,6 +213,9 @@ canvas.onmousemove = function (evento) {
         switch (escolha) {
             case DRAGNDROP:
                 objeto.executaTranslacao(mouse_x, mouse_y);
+                break;
+            case ESCALAMENTO:
+                objeto.executaEscalamento(mouse_x, mouse_y);
                 break;
             default:
                 objeto.drawPreview(mouse_x, mouse_y);
@@ -258,6 +280,15 @@ function BotaoClicado(nome) {
             }
             else {
                 info_text.innerHTML = "Não Há Objetos Para Mudar Posição";
+            }
+            break;
+        case "escalamento":
+            escolha = ESCALAMENTO;
+            if (objetos.length > 0) {
+                info_text.innerHTML = "Você Está Escalando um Objeto";
+            }
+            else {
+                info_text.innerHTML = "Não Há Objetos Para Escalar";
             }
             break;
         default:
