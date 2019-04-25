@@ -64,11 +64,13 @@ function Escalamento(x, y, pontoTransformacao, pontos, pontos2) {
     }
 }
 
-function Rotacao(x, y, pontoTransformacao, ultimoAngulo, pontos, pontos2) {
+function Rotacao(x, y, pontoTransformacao, pontos, pontos2) {
     for (var i = 0; i < Object.keys(pontos).length; i++) {
         var angPonto = Math.atan2(pontos2[0].y - pontoTransformacao.y, pontos2[0].x - pontoTransformacao.x);
         var angMouse = Math.atan2(y - pontoTransformacao.y, x - pontoTransformacao.x);
-        var angulo, sentidoHorario;
+        var angulo;
+
+        angulo = Math.abs(angPonto) + angMouse;
 
         var sen = Math.sin(angulo);
         var cos = Math.cos(angulo);
@@ -86,7 +88,6 @@ class Objeto {
         this.pontos = [];
         this.pontos2 = [];
         this.deltaTranslacao = null;
-        this.ultimoAngulo = null;
     }
 
     adicionaPonto(x, y) {
@@ -140,7 +141,7 @@ class Objeto {
     }
 
     executaRotacao(x, y) {
-        Rotacao(x, y, this.pontoTransformacao, this.ultimoAngulo, this.pontos, this.pontos2);
+        Rotacao(x, y, this.pontoTransformacao, this.pontos, this.pontos2);
     }
 
     finalizaTransformacao() {
@@ -280,24 +281,11 @@ class Reta extends Objeto {
             //Se linha sendo desenhada estiver no 3º ou 4º quadrantes
             if (angarctanthis > 0) {
                 var anguloSuplementar = 180 - Math.abs(angarctanreta);
-                if (angarctanthis <= anguloSuplementar) {
-                    sentidoHorario = false;
-                }
-                else {
-                    sentidoHorario = true;
-                }
+                sentidoHorario = angarctanthis <= anguloSuplementar;
             }
             //Se as duas linhas estiverem no 1º ou 2º quadrantes
             else {
-                //Se reta já desenhada estiver à esquerda
-                if (angarctanreta < angarctanthis) {
-                    //Desenha da reta já desenhada em sentido horário
-                    sentidoHorario = false;
-                }
-                else {
-                    //Desenha da reta já desenhada em sentido anti horário
-                    sentidoHorario = true;
-                }
+                sentidoHorario = angarctanreta > angarctanthis;
             }
         }
         //Se linha já desenhada estiver no 2º quadrante
@@ -305,24 +293,11 @@ class Reta extends Objeto {
             //Se linha sendo desenhada estiver no 3º ou 4º quadrantes
             if (angarctanthis > 0) {
                 var anguloSuplementar = 180 - Math.abs(angarctanreta);
-                if (angarctanthis <= anguloSuplementar) {
-                    sentidoHorario = false;
-                }
-                else {
-                    sentidoHorario = true;
-                }
+                sentidoHorario = angarctanthis <= anguloSuplementar;
             }
             //Se as duas linhas estiverem no 1º ou 2º quadrantes
             else {
-                //Se reta já desenhada estiver à esquerda
-                if (angarctanreta < angarctanthis) {
-                    //Desenha a partir da reta já desenhada em sentido horário
-                    sentidoHorario = false;
-                }
-                else {
-                    //Desenha da reta já desenhada em sentido anti horário
-                    sentidoHorario = true;
-                }
+                sentidoHorario = angarctanreta > angarctanthis;
             }
         }
         //Se linha já desenhada estiver no 3º quadrante
@@ -330,24 +305,11 @@ class Reta extends Objeto {
             //Se linha sendo desenhada estiver no 1º ou 2º quadrantes
             if (angarctanthis < 0) {
                 var anguloSuplementar = (180 - angarctanreta) * (-1);
-                if (angarctanthis <= anguloSuplementar) {
-                    sentidoHorario = false;
-                }
-                else {
-                    sentidoHorario = true;
-                }
+                sentidoHorario = angarctanthis >= anguloSuplementar;
             }
             //Se as duas linhas estiverem no 3º ou 4º quadrantes
             else {
-                //Se ângulo da reta já desenhada em relação ao eixo x for maior que da nova linha
-                if (angarctanreta > angarctanthis) {
-                    //Desenha a partir da reta já desenhada em sentido anti horário
-                    sentidoHorario = true;
-                }
-                else {
-                    //Desenha da reta já desenhada em sentido horário
-                    sentidoHorario = false;
-                }
+                sentidoHorario = angarctanreta > angarctanthis;
             }
         }
         //Se linha já desenhada estiver no 4º quadrante
@@ -355,24 +317,11 @@ class Reta extends Objeto {
             //Se linha sendo desenhada estiver no 1º ou 2º quadrantes
             if (angarctanthis < 0) {
                 var anguloSuplementar = (180 - angarctanreta) * (-1);
-                if (angarctanthis <= anguloSuplementar) {
-                    sentidoHorario = false;
-                }
-                else {
-                    sentidoHorario = true;
-                }
+                sentidoHorario = angarctanthis >= anguloSuplementar;
             }
             //Se as duas linhas estiverem no 3º ou 4º quadrantes
             else {
-                //Se ângulo da linha já desenhada em relação ao eixo x for maior que da nova linha
-                if (angarctanreta > angarctanthis) {
-                    //Desenha a partir da reta já desenhada em sentido anti horário
-                    sentidoHorario = true;
-                }
-                else {
-                    //Desenha da reta já desenhada em sentido anti horário
-                    sentidoHorario = false;
-                }
+                sentidoHorario = angarctanreta > angarctanthis;
             }
         }
 
