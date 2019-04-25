@@ -24,11 +24,11 @@ function Norma2(x, y, z) {
     return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
 }
 
-function ProdutoInterno(reta, atual) {
-    var deltaX1 = reta[1].x - reta[0].x;
-    var deltaX2 = atual[1].x - atual[0].x;
-    var deltaY1 = reta[1].y - reta[0].y;
-    var deltaY2 = atual[1].y - atual[0].y;
+function ProdutoInterno(reta1, reta2) {
+    var deltaX1 = reta1[1].x - reta1[0].x;
+    var deltaX2 = reta2[1].x - reta2[0].x;
+    var deltaY1 = reta1[1].y - reta1[0].y;
+    var deltaY2 = reta2[1].y - reta2[0].y;
     return (deltaX1 * deltaX2) + (deltaY1 * deltaY2);
 }
 
@@ -64,6 +64,20 @@ function Escalamento(x, y, pontoTransformacao, pontos, pontos2) {
     }
 }
 
+function Rotacao(x, y, pontoTransformacao, ultimoAngulo, pontos, pontos2) {
+    for (var i = 0; i < Object.keys(pontos).length; i++) {
+        var angPonto = Math.atan2(pontos2[0].y - pontoTransformacao.y, pontos2[0].x - pontoTransformacao.x);
+        var angMouse = Math.atan2(y - pontoTransformacao.y, x - pontoTransformacao.x);
+        var angulo, sentidoHorario;
+
+        var sen = Math.sin(angulo);
+        var cos = Math.cos(angulo);
+
+        pontos[i].x = ((pontos2[i].x - pontoTransformacao.x) * cos) - ((pontos2[i].y - pontoTransformacao.y) * sen) + pontoTransformacao.x;
+        pontos[i].y = ((pontos2[i].x - pontoTransformacao.x) * sen) + ((pontos2[i].y - pontoTransformacao.y) * cos) + pontoTransformacao.y;
+    }
+}
+
 class Objeto {
     constructor(context) {
         this.context = context;
@@ -72,6 +86,7 @@ class Objeto {
         this.pontos = [];
         this.pontos2 = [];
         this.deltaTranslacao = null;
+        this.ultimoAngulo = null;
     }
 
     adicionaPonto(x, y) {
@@ -124,8 +139,13 @@ class Objeto {
         Escalamento(x, y, this.pontoTransformacao, this.pontos, this.pontos2);
     }
 
+    executaRotacao(x, y) {
+        Rotacao(x, y, this.pontoTransformacao, this.ultimoAngulo, this.pontos, this.pontos2);
+    }
+
     finalizaTransformacao() {
         this.pontos2 = JSON.parse(JSON.stringify(this.pontos)); //copia novos pontos
+        this.ultimoAngulo = null;
     }
 }
 

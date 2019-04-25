@@ -198,6 +198,28 @@ canvas.onmousedown = function (evento) {
                 }
             }
             break;
+        case ROTACAO:
+            if (mouse_left != 2) {
+                if (mouse_flag == 0) {
+                    for (i = Object.keys(objetos).length - 1; i >= 0; i--) {
+                        objeto = objetos[i];
+
+                        if (objeto.clicado(mouse_x, mouse_y)) {
+                            mouse_flag = 1;
+                            break;
+                        }
+                    }
+                }
+                else if (mouse_flag == 1) {
+                    objeto.iniciaTransformacao(mouse_x, mouse_y);
+                    mouse_flag = 2;
+                }
+                else {
+                    mouse_flag = 0;
+                    objeto.finalizaTransformacao();
+                }
+            }
+            break;
     }
 }
 
@@ -216,6 +238,10 @@ canvas.onmousemove = function (evento) {
                 break;
             case ESCALAMENTO:
                 objeto.executaEscalamento(mouse_x, mouse_y);
+                break;
+            case ROTACAO:
+                if (mouse_flag > 1)
+                    objeto.executaRotacao(mouse_x, mouse_y);
                 break;
             default:
                 objeto.drawPreview(mouse_x, mouse_y);
@@ -289,6 +315,15 @@ function BotaoClicado(nome) {
             }
             else {
                 info_text.innerHTML = "Não Há Objetos Para Escalar";
+            }
+            break;
+        case "rotacao":
+            escolha = ROTACAO;
+            if (objetos.length > 0) {
+                info_text.innerHTML = "Você Está Rotacionando um Objeto";
+            }
+            else {
+                info_text.innerHTML = "Não Há Objetos Para Rotacionar";
             }
             break;
         default:
