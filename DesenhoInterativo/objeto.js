@@ -57,9 +57,7 @@ function Translacao(x, y, pontoTransformacao, pontos, pontos2) {
 function Escalamento(x, y, pontoTransformacao, pontos, pontos2) {
     var quocienteEscalamento = new Coordenada(x / pontoTransformacao.x, y / pontoTransformacao.y);
 
-    var i;
-
-    for (i = 0; i < Object.keys(pontos).length; i++) {
+    for (var i = 0; i < Object.keys(pontos).length; i++) {
         var offsetX = (pontos2[i].x - pontoTransformacao.x) * quocienteEscalamento.x;
         var offsetY = (pontos2[i].y - pontoTransformacao.y) * quocienteEscalamento.y;
 
@@ -629,7 +627,12 @@ class Circulo extends Objeto {
         super.draw();
 
         this.context.beginPath();
+
         this.raio = Norma(this.pontos[0].x, this.pontos[0].y, this.pontos[1].x, this.pontos[1].y);
+
+        if (this.raio2 === undefined)
+            this.raio2 = this.raio;
+
         this.context.arc(this.pontos[0].x, this.pontos[0].y, this.raio, 0, 2 * Math.PI);
         this.context.fill();
 
@@ -673,13 +676,11 @@ class Circulo extends Objeto {
     }
 
     executaEscalamento(x, y) {
-        var quocienteEscalamento = new Coordenada(x / this.pontoTransformacao.x, y / this.pontoTransformacao.y);
+        var fatorEscalamento = x / this.pontoTransformacao.x;
 
-        var offsetX = (this.pontos2[1].x - this.pontoTransformacao.x) * quocienteEscalamento.x;
-        var offsetY = (this.pontos2[1].y - this.pontoTransformacao.y) * quocienteEscalamento.y;
+        var offsetX = this.raio2 * fatorEscalamento;
 
-        this.pontos[1].x = offsetX + this.pontoTransformacao.x;
-        this.pontos[1].y = offsetY + this.pontoTransformacao.y;
+        this.pontos[1].x = offsetX + this.pontos2[0].x;
     }
 }
 
