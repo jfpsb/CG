@@ -40,6 +40,10 @@ function GrauParaRadiano(graus) {
     return (Math.PI * graus) / 180;
 }
 
+function Hipotenusa(cat1, cat2) {
+    return Math.sqrt(Math.pow(cat1, 2) + Math.pow(cat2, 2));
+}
+
 function Translacao(x, y, pontoTransformacao, pontos, pontos2) {
     var deltaTranslacao = new Coordenada(x - pontoTransformacao.x, y - pontoTransformacao.y);
     var i;
@@ -77,6 +81,58 @@ function Rotacao(x, y, pontoTransformacao, pontos, pontos2) {
 
         pontos[i].x = ((pontos2[i].x - pontoTransformacao.x) * cos) - ((pontos2[i].y - pontoTransformacao.y) * sen) + pontoTransformacao.x;
         pontos[i].y = ((pontos2[i].x - pontoTransformacao.x) * sen) + ((pontos2[i].y - pontoTransformacao.y) * cos) + pontoTransformacao.y;
+    }
+}
+
+function Espelhamento(context, objeto, retaTransformacao, pontos) {
+    var angulo = Math.atan2(retaTransformacao.pontos[1].y - retaTransformacao.pontos[0].y, retaTransformacao.pontos[1].x - retaTransformacao.pontos[0].x);
+    var sin, cos, xi, yi, xi2, yi2, ponto_eixo_y, distancia;
+    var angulo1, angulo2;
+
+    //1º e 4º quadrantes
+    if (angulo >= -(Math.PI / 2) && angulo < (Math.PI / 2)) {
+        angulo1 = (-1) * angulo;
+        angulo2 = angulo;
+    }
+    //2º quadrante
+    else if (angulo < -(Math.PI / 2) && angulo >= -(Math.PI)) {
+        angulo = Math.PI + angulo;
+        angulo1 = (-1) * angulo;
+        angulo2 = angulo;
+    }
+    //3º quadrante
+    else if (angulo < Math.PI && angulo >= (Math.PI / 2)) {
+        angulo = Math.PI - angulo;
+        angulo1 = angulo;
+        angulo2 = (-1) * angulo;
+    }
+
+    for (var i = 0; i < Object.keys(pontos).length; i++) {
+        sin = Math.sin(angulo1);
+        cos = Math.cos(angulo1);
+
+        xi = (((pontos[i].x - retaTransformacao.pontos[0].x) * cos) - ((pontos[i].y - retaTransformacao.pontos[0].y) * sin)) + retaTransformacao.pontos[0].x;
+        yi = (((pontos[i].x - retaTransformacao.pontos[0].x) * sin) + ((pontos[i].y - retaTransformacao.pontos[0].y) * cos)) + retaTransformacao.pontos[0].y;
+
+        ponto_eixo_y = ((retaTransformacao.pontos[1].x - retaTransformacao.pontos[0].x) * sin) + ((retaTransformacao.pontos[1].y - retaTransformacao.pontos[0].y) * cos) + retaTransformacao.pontos[0].y;
+
+        //Distância entre ponto e eixo x rotacionado
+        distancia = ponto_eixo_y - yi;
+
+        //Ponto y espelhado
+        var ponto_y = ponto_eixo_y + distancia;
+
+        sin = Math.sin(angulo2);
+        cos = Math.cos(angulo2);
+
+        //Pontos rotacionados de volta
+        xi2 = (((xi - retaTransformacao.pontos[0].x) * cos) - ((ponto_y - retaTransformacao.pontos[0].y) * sin)) + retaTransformacao.pontos[0].x;
+        yi2 = (((xi - retaTransformacao.pontos[0].x) * sin) + ((ponto_y - retaTransformacao.pontos[0].y) * cos)) + retaTransformacao.pontos[0].y;
+
+        objeto.adicionaPonto(xi2, yi2);
+
+        context.fillStyle = "#008000";
+        context.fillRect(xi2, yi2, 2, 2);
     }
 }
 
@@ -128,7 +184,8 @@ class Objeto {
         }
         //Argumento é a reta que será usada no espelhamento
         else {
-            this.retaTransformacao = arguments[0];
+            var r = arguments[0];
+            this.retaTransformacao = r;
         }
     }
 
@@ -144,9 +201,31 @@ class Objeto {
         Rotacao(x, y, this.pontoTransformacao, this.pontos, this.pontos2);
     }
 
+    executaEspelhamento() {
+        if (this instanceof Ponto) {
+            this.objeto = new Ponto(this.context);
+        }
+        else if (this instanceof Reta) {
+            this.objeto = new Reta(this.context);
+        }
+        else if (this instanceof Poligono) {
+            this.objeto = new Poligono(this.context);
+        }
+        else if (this instanceof Circulo) {
+            this.objeto = new Circulo(this.context);
+            console.log("Circulo");
+        }
+        else {
+            this.objeto = new CurvaDeBezier(this.context);
+        }
+
+        Espelhamento(this.context, this.objeto, this.retaTransformacao, this.pontos);
+
+        return this.objeto;
+    }
+
     finalizaTransformacao() {
         this.pontos2 = JSON.parse(JSON.stringify(this.pontos)); //copia novos pontos
-        this.ultimoAngulo = null;
     }
 }
 
@@ -177,6 +256,9 @@ class Reta extends Objeto {
         this.context.moveTo(this.pontos[0].x, this.pontos[0].y);
         this.context.lineTo(this.pontos[1].x, this.pontos[1].y);
         this.context.stroke();
+
+        if (arguments.length == 0)
+            return;
 
         //Desenho um ponto vermelho para indicar o começo da linha
         this.context.fillStyle = "#FF0000";
@@ -281,7 +363,7 @@ class Reta extends Objeto {
             //Se linha sendo desenhada estiver no 3º ou 4º quadrantes
             if (angarctanthis > 0) {
                 var anguloSuplementar = 180 - Math.abs(angarctanreta);
-                sentidoHorario = angarctanthis <= anguloSuplementar;
+                sentidoHorario = angarctanthis >= anguloSuplementar;
             }
             //Se as duas linhas estiverem no 1º ou 2º quadrantes
             else {
@@ -543,30 +625,11 @@ class Poligono extends Objeto {
 }
 
 class Circulo extends Objeto {
-    constructor(context, raio, cor, corBorda) {
-        super(context);
-
-        if (raio !== undefined) {
-            this.raioFixo = true;
-            this.raio = raio;
-            this.cor = cor;
-            this.corBorda = corBorda;
-        }
-    }
-
     draw() {
         super.draw();
 
         this.context.beginPath();
-
-        if (!(typeof this.raio === 'undefined')) {
-            this.raio = Norma(this.pontos[0].x, this.pontos[0].y, this.pontos[1].x, this.pontos[1].y);
-            //Coloco o raio da circuferência simbolizado como uma linha horizontal
-            //Ajuda no escalamento
-            this.pontos[1].x = this.pontos[0].x + this.raio;
-            this.pontos[1].y = this.pontos[0].y;
-        }
-
+        this.raio = Norma(this.pontos[0].x, this.pontos[0].y, this.pontos[1].x, this.pontos[1].y);
         this.context.arc(this.pontos[0].x, this.pontos[0].y, this.raio, 0, 2 * Math.PI);
         this.context.fill();
 

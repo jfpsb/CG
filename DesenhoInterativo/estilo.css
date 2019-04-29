@@ -4,6 +4,7 @@
 
 .botao {
     padding: 10px;
+    margin: 5px;
     font-family: "Century Gothic";
     font-weight: bold;
     font-size: 20px;
@@ -13,20 +14,4 @@
     font-family: "Century Gothic";
     font-weight: bold;
     font-size: 20px;
-}
-
-#side_buttons {
-    position: absolute;
-    right: 115px;
-    top: 0;
-}
-
-#side_buttons button {
-    width: 100%;
-    display: block;
-    margin-bottom: 5px;
-}
-
-#canvas_wrapper {
-    position: relative;
 }

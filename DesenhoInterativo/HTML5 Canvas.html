@@ -16,21 +16,24 @@
         <button class="botao" onclick="BotaoClicado('pintar')">Pintar</button>
         <button class="botao" onclick="BotaoClicado('area')">Área</button>
         <button class="botao" onclick="BotaoClicado('apagar')">Apagar Tudo</button>
+        <br />
+        <button class="botao" onclick="BotaoClicado('dragndrop')">Drag And Drop</button>
+        <button class="botao" onclick="BotaoClicado('espelhamento')">Espelhamento</button>
+        <button class="botao" onclick="BotaoClicado('rotacao')">Rotação</button>
+        <button class="botao" onclick="BotaoClicado('escalamento')">Escalamento</button>
+        <button class="botao" onclick="BotaoClicado('quickhull')">Fecho Convexo - QuickHull</button>
+        <button class="botao" onclick="BotaoClicado('forcabruta')">Fecho Convexo - Força Bruta</button>
         <div id="info" class="wrapper" align="center">
             <h2 id="info_text">Aperte Em Um Botão!</h2>
         </div>
     </div>
     <div id="canvas_wrapper" class="wrapper" align="center">
         <canvas id="canvas"
-                width="1280" height="720"
+                width="1920" height="1080"
                 style="border:1px solid #000000;"></canvas>
-        <div id="side_buttons">
-            <button class="botao" onclick="BotaoClicado('dragndrop')">Drag And Drop</button>
-            <button class="botao" onclick="BotaoClicado('espelhamento')">Espelhamento</button>
-            <button class="botao" onclick="BotaoClicado('rotacao')">Rotação</button>
-            <button class="botao" onclick="BotaoClicado('escalamento')">Escalamento</button>
-        </div>
     </div>
+    <script src="convexhullfb.js"></script>
+    <script src="quickhull.js"></script>
     <script src="objeto.js"></script>
     <script src="canvas.js"></script>
 </body>

@@ -16,6 +16,7 @@ const ROTACAO = 10;
 const ESCALAMENTO = 11;
 
 var objeto;
+var objeto2;
 var objetos = [];
 var i;
 
@@ -220,6 +221,35 @@ canvas.onmousedown = function (evento) {
                 }
             }
             break;
+        case ESPELHAMENTO:
+            if (mouse_left != 2) {
+                if (mouse_flag == 0) {
+                    for (i = Object.keys(objetos).length - 1; i >= 0; i--) {
+                        objeto = objetos[i];
+
+                        if (objeto.clicado(mouse_x, mouse_y)) {
+                            mouse_flag = 1;
+                            break;
+                        }
+                    }
+                }
+                else if (mouse_flag == 1) {
+                    objeto2 = new Reta(context);
+                    objeto2.adicionaPonto(mouse_x, mouse_y);
+                    mouse_flag = 2;
+                }
+                else if (mouse_flag == 2) {
+                    objeto2.adicionaPonto(mouse_x, mouse_y);
+                    objeto2.draw();
+                    objeto.iniciaTransformacao(objeto2);
+                    var o = objeto.executaEspelhamento();
+                    objeto.finalizaTransformacao();
+                    mouse_flag = 0;
+
+                    objetos.push(o);
+                }
+            }
+            break;
     }
 }
 
@@ -242,6 +272,13 @@ canvas.onmousemove = function (evento) {
             case ROTACAO:
                 if (mouse_flag > 1)
                     objeto.executaRotacao(mouse_x, mouse_y);
+                break;
+            case ESPELHAMENTO:
+                if (mouse_flag == 0)
+                    objeto.drawPreview(mouse_x, mouse_y);
+
+                if (mouse_flag == 2)
+                    objeto2.drawPreview(mouse_x, mouse_y);
                 break;
             default:
                 objeto.drawPreview(mouse_x, mouse_y);
@@ -326,8 +363,70 @@ function BotaoClicado(nome) {
                 info_text.innerHTML = "Não Há Objetos Para Rotacionar";
             }
             break;
+        case "espelhamento":
+            escolha = ESPELHAMENTO;
+            if (objetos.length > 0) {
+                info_text.innerHTML = "Você Está Espelhando um Objeto";
+            }
+            else {
+                info_text.innerHTML = "Não Há Objetos Para Espelhar";
+            }
+            break;
+        case "quickhull":
+            var num_pontos = 0;
+            var pontos = [];
+            for (var i = 0; i < Object.keys(objetos).length; i++) {
+                var obj = objetos[i];
+                for (var j = 0; j < Object.keys(obj.pontos).length; j++) {
+                    var ponto = obj.pontos[j];
+                    pontos.push(ponto);
+                    num_pontos++;
+                }
+            }
+
+            if (num_pontos < 3) {
+                info_text.innerHTML = "Não Há Pontos Suficientes No Canvas";
+                return;
+            }
+
+            var h = QuickHull(pontos);
+
+            context.strokeStyle = "#FF0000";
+
+            context.beginPath();
+            context.moveTo(h[0].x, h[0].y);
+
+            for (var i = 1; i < hull.length; i++) {
+                context.lineTo(h[i].x, h[i].y);
+            }
+
+            context.closePath();
+            context.stroke();
+
+            break;
+        case "forcabruta":
+            var num_pontos = 0;
+            var pontos = [];
+            for (var i = 0; i < Object.keys(objetos).length; i++) {
+                var obj = objetos[i];
+                for (var j = 0; j < Object.keys(obj.pontos).length; j++) {
+                    var ponto = obj.pontos[j];
+                    pontos.push(ponto);
+                    num_pontos++;
+                }
+            }
+
+            if (num_pontos < 3) {
+                info_text.innerHTML = "Não Há Pontos Suficientes No Canvas";
+                return;
+            }
+
+            ConvexHullFB(context, pontos);
+
+            break;
         default:
             objeto = null;
+            objeto2 = null;
             objetos = [];
             info_text.innerHTML = "Aperte Em Um Botão!";
             context.clearRect(0, 0, canvas.width, canvas.height);
