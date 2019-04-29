@@ -47,12 +47,14 @@ canvas.onmousedown = function (evento) {
                     objeto = new Reta(context);
                     objeto.adicionaPonto(mouse_x, mouse_y);
                     mouse_flag++;
+                    info_text.innerHTML = "Selecione o Segundo Ponto Da Reta";
                 }
                 else {
                     objeto.adicionaPonto(mouse_x, mouse_y);
                     objeto.draw(objetos);
                     objetos.push(objeto);
                     mouse_flag = 0;
+                    info_text.innerHTML = "Você Está Desenhando Uma Reta";
                 }
             }
             break;
@@ -62,6 +64,7 @@ canvas.onmousedown = function (evento) {
                     objeto = new Poligono(context);
                     objeto.adicionaPonto(mouse_x, mouse_y);
                     mouse_flag++;
+                    info_text.innerHTML = "Selecione o Próximo Ponto Do Polígono. Aperte o Botão Direito do Mouse Para Encerrar";
                 }
                 else {
                     objeto.adicionaPonto(mouse_x, mouse_y);
@@ -77,6 +80,7 @@ canvas.onmousedown = function (evento) {
                     objetos.push(objeto);
                     objeto.draw();
                     mouse_flag = 0;
+                    info_text.innerHTML = "Você Está Desenhando Um Polígono";
                 }
             }
             break;
@@ -86,12 +90,14 @@ canvas.onmousedown = function (evento) {
                     objeto = new Circulo(context);
                     objeto.adicionaPonto(mouse_x, mouse_y);
                     mouse_flag++;
+                    info_text.innerHTML = "Selecione o Ponto Onde O Círculo Irá Terminar";
                 }
                 else {
                     objeto.adicionaPonto(mouse_x, mouse_y);
                     objetos.push(objeto);
                     objeto.draw();
                     mouse_flag = 0;
+                    info_text.innerHTML = "Você Está Desenhando Um Círculo";
                 }
             }
             break;
@@ -101,6 +107,7 @@ canvas.onmousedown = function (evento) {
                     objeto = new CurvaDeBezier(context);
                     objeto.adicionaPonto(mouse_x, mouse_y);
                     mouse_flag++;
+                    info_text.innerHTML = "Selecione o Próximo Ponto Da Curva De Bezier";
                 }
                 else {
                     objeto.adicionaPonto(mouse_x, mouse_y);
@@ -110,6 +117,7 @@ canvas.onmousedown = function (evento) {
                         objetos.push(objeto);
                         objeto.draw();
                         mouse_flag = 0;
+                        info_text.innerHTML = "Você Está Desenhando Uma Curva de Bezier";
                     }
                 }
             }
@@ -170,6 +178,7 @@ canvas.onmousedown = function (evento) {
                         if (objeto.clicado(mouse_x, mouse_y)) {
                             objeto.iniciaTransformacao(mouse_x, mouse_y);
                             mouse_flag = 1;
+                            info_text.innerHTML = "Clique Novamente Para Finalizar";
                             break;
                         }
                     }
@@ -177,6 +186,7 @@ canvas.onmousedown = function (evento) {
                 else {
                     mouse_flag = 0;
                     objeto.finalizaTransformacao();
+                    info_text.innerHTML = "Você Está Mudando a Posição de um Objeto.<br />Clique No Objeto Que Deseja Mudar de Posição. Clique Novamente Para Fixar Em Nova Posição";
                 }
             }
             break;
@@ -189,6 +199,7 @@ canvas.onmousedown = function (evento) {
                         if (objeto.clicado(mouse_x, mouse_y)) {
                             objeto.iniciaTransformacao(mouse_x, mouse_y);
                             mouse_flag = 1;
+                            info_text.innerHTML = "Mova a Seta do Mouse para Direita ou Esquerda";
                             break;
                         }
                     }
@@ -196,6 +207,7 @@ canvas.onmousedown = function (evento) {
                 else {
                     mouse_flag = 0;
                     objeto.finalizaTransformacao();
+                    info_text.innerHTML = "Você Está Escalando um Objeto. Clique No Objeto Que Deseja Escalar e Use a Seta do Mouse.<br/>Clique Novamente para Finalizar";
                 }
             }
             break;
@@ -207,6 +219,7 @@ canvas.onmousedown = function (evento) {
 
                         if (objeto.clicado(mouse_x, mouse_y)) {
                             mouse_flag = 1;
+                            info_text.innerHTML = "Selecione no Canvas o Ponto De Rotação";
                             break;
                         }
                     }
@@ -218,6 +231,7 @@ canvas.onmousedown = function (evento) {
                 else {
                     mouse_flag = 0;
                     objeto.finalizaTransformacao();
+                    info_text.innerHTML = "Você Está Rotacionando um Objeto.<br/>Clique no Objeto Que Deseja Rotacionar, Depois Clique Onde Será o Ponto de Rotação";
                 }
             }
             break;
@@ -229,6 +243,7 @@ canvas.onmousedown = function (evento) {
 
                         if (objeto.clicado(mouse_x, mouse_y)) {
                             mouse_flag = 1;
+                            info_text.innerHTML = "Selecione o Primeiro Ponto da Reta de Espelhamento";
                             break;
                         }
                     }
@@ -237,6 +252,7 @@ canvas.onmousedown = function (evento) {
                     objeto2 = new Reta(context);
                     objeto2.adicionaPonto(mouse_x, mouse_y);
                     mouse_flag = 2;
+                    info_text.innerHTML = "Selecione o Segundo Ponto da Reta de Espelhamento";
                 }
                 else if (mouse_flag == 2) {
                     objeto2.adicionaPonto(mouse_x, mouse_y);
@@ -247,6 +263,8 @@ canvas.onmousedown = function (evento) {
                     mouse_flag = 0;
 
                     objetos.push(o);
+
+                    info_text.innerHTML = "Você Está Espelhando um Objeto.<br/>Clique no Objeto que Deseja Espelhar, Depois Desenhe a Reta Usada no Espelhamento";
                 }
             }
             break;
@@ -320,57 +338,39 @@ function BotaoClicado(nome) {
             break;
         case "pintar":
             escolha = PINTAR;
-            if (objetos.length > 0) {
-                info_text.innerHTML = "Você Está Pintando Um Objeto";
-            }
-            else {
-                info_text.innerHTML = "Não Há Objetos Para Pintar";
-            }
+
+            info_text.innerHTML = "Você Está Pintando Um Objeto. Clique No Objeto Que Deseja Pintar.<br />Clique Novamente Para Que Retorne a Cor";
+
             break;
         case "area":
             escolha = AREA;
-            if (objetos.length > 0) {
-                info_text.innerHTML = "Você Está Calculando a Área de um Objeto";
-            }
-            else {
-                info_text.innerHTML = "Não Há Objetos Para Calcular Área";
-            }
+
+            info_text.innerHTML = "Você Está Calculando a Área de um Objeto. Clique No Objeto Que Deseja Calcular a Área";
+
             break;
         case "dragndrop":
             escolha = DRAGNDROP;
-            if (objetos.length > 0) {
-                info_text.innerHTML = "Você Está Mudando a Posição de um Objeto";
-            }
-            else {
-                info_text.innerHTML = "Não Há Objetos Para Mudar Posição";
-            }
+
+            info_text.innerHTML = "Você Está Mudando a Posição de um Objeto.<br />Clique No Objeto Que Deseja Mudar de Posição. Clique Novamente Para Fixar Em Nova Posição";
+
             break;
         case "escalamento":
             escolha = ESCALAMENTO;
-            if (objetos.length > 0) {
-                info_text.innerHTML = "Você Está Escalando um Objeto";
-            }
-            else {
-                info_text.innerHTML = "Não Há Objetos Para Escalar";
-            }
+
+            info_text.innerHTML = "Você Está Escalando um Objeto. Clique No Objeto Que Deseja Escalar e Use a Seta do Mouse.<br/>Clique Novamente para Finalizar";
+
             break;
         case "rotacao":
             escolha = ROTACAO;
-            if (objetos.length > 0) {
-                info_text.innerHTML = "Você Está Rotacionando um Objeto";
-            }
-            else {
-                info_text.innerHTML = "Não Há Objetos Para Rotacionar";
-            }
+
+            info_text.innerHTML = "Você Está Rotacionando um Objeto.<br/>Clique no Objeto Que Deseja Rotacionar, Depois Clique Onde Será o Ponto de Rotação";
+
             break;
         case "espelhamento":
             escolha = ESPELHAMENTO;
-            if (objetos.length > 0) {
-                info_text.innerHTML = "Você Está Espelhando um Objeto";
-            }
-            else {
-                info_text.innerHTML = "Não Há Objetos Para Espelhar";
-            }
+
+            info_text.innerHTML = "Você Está Espelhando um Objeto.<br/>Clique no Objeto que Deseja Espelhar, Depois Desenhe a Reta Usada no Espelhamento";
+
             break;
         case "quickhull":
             var num_pontos = 0;
@@ -403,6 +403,8 @@ function BotaoClicado(nome) {
             context.closePath();
             context.stroke();
 
+            info_text.innerHTML = "Mostrando Fecho Convexo de Todos os Pontos Do Canvas";
+
             break;
         case "forcabruta":
             var num_pontos = 0;
@@ -422,6 +424,8 @@ function BotaoClicado(nome) {
             }
 
             ConvexHullFB(context, pontos);
+
+            info_text.innerHTML = "Mostrando Fecho Convexo de Todos os Pontos Do Canvas";
 
             break;
         default:
