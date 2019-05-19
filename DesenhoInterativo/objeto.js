@@ -211,7 +211,6 @@ class Objeto {
         }
         else if (this instanceof Circulo) {
             this.objeto = new Circulo(this.context);
-            console.log("Circulo");
         }
         else {
             this.objeto = new CurvaDeBezier(this.context);
@@ -410,7 +409,7 @@ class Reta extends Objeto {
     }
 
     clicado(x, y) {
-        var TOL = 3 / 2; //A área total de tolerância são 3 pixels, mas o centro dela fica a 1,5 pixel de cada lado
+        var TOL = 1; //A área total de tolerância são 3 pixels, mas o centro dela fica a 1,5 pixel de cada lado
         var xmin = x - TOL, xmax = x + TOL, ymin = y - TOL, ymax = y + TOL;
         var x0 = this.pontos[0].x, y0 = this.pontos[0].y, x1 = this.pontos[1].x, y1 = this.pontos[1].y;
         var i;
@@ -440,11 +439,11 @@ class Reta extends Objeto {
             }
             else if (flags0[2]) {
                 x0 += (ymax - y0) * (x1 - x0) / (y1 - y0);
-                y0 = ymin;
+                y0 = ymax;
             }
             else if (flags0[3]) {
-                x0 += (ymax - y0) * (x1 - x0) / (y1 - y0);
-                y0 = ymax;
+                x0 += (ymin - y0) * (x1 - x0) / (y1 - y0);
+                y0 = ymin;
             }
             else {
                 return true;

@@ -1,0 +1,94 @@
+<ui version="4.0" >
+	<author>GeometryFactory</author>
+	<class>delaunay_voronoi_cg</class>
+	<widget class="QMainWindow" name="delaunay_voronoi_cg" >
+		  <property name="geometry" >
+			   <rect>
+			    <x>0</x>
+			    <y>0</y>
+			    <width>800</width>
+			    <height>600</height>
+			   </rect>
+		  </property>
+		  <property name="windowTitle" >
+			<string>Delaunay/Voronoi CGAL (CG)</string>
+		  </property>
+		  <property name="windowIcon" >
+			<iconset resource="../resources/CGAL.qrc" >
+			<normaloff>:/cgal/logos/cgal_icon</normaloff>:/cgal/logos/cgal_icon</iconset>
+		  </property>
+		  <widget class="QWidget" name="centralwidget" >
+			   <layout class="QGridLayout" >
+				    <item row="0" column="0" >
+					     <widget class="QGraphicsView" name="graphicsView" >
+						      <property name="focusPolicy" >
+						      	<enum>Qt::StrongFocus</enum>
+						      </property>
+						      <property name="verticalScrollBarPolicy" >
+						      	<enum>Qt::ScrollBarAlwaysOn</enum>
+						      </property>
+						      <property name="horizontalScrollBarPolicy" >
+						      	<enum>Qt::ScrollBarAlwaysOn</enum>
+						      </property>
+						      <property name="transformationAnchor" >
+						      	<enum>QGraphicsView::NoAnchor</enum>
+						      </property>
+					     </widget>
+				    </item>
+			   </layout>
+		</widget>
+		<widget class="QStatusBar" name="statusbar" />
+		<widget class="QToolBar" name="toolBar" >
+			<property name="windowTitle" >
+				<string>Visualization Tools</string>
+			</property>
+			<attribute name="toolBarArea" >
+				<enum>TopToolBarArea</enum>
+			</attribute>
+			<attribute name="toolBarBreak" >
+				<bool>false</bool>
+			</attribute>
+			<addaction name="actionShowVoronoi" />
+			<addaction name="separator" />
+			<addaction name="actionRecenter" />
+		</widget>
+	  <action name="actionShowVoronoi" >
+	   <property name="checkable" >
+	    <bool>true</bool>
+	   </property>
+	   <property name="checked" >
+	    <bool>false</bool>
+	   </property>
+	   <property name="icon" >
+	    <iconset resource="../icons/Triangulation_2.qrc" >
+	     <normaloff>:/cgal/Triangulation_2/Voronoi_diagram_2.png</normaloff>:/cgal/Triangulation_2/Voronoi_diagram_2.png</iconset>
+	   </property>
+	   <property name="text" >
+	    <string>Mostrar/Ocultar Diagrama de Voronoi</string>
+	   </property>
+	   <property name="shortcut" >
+	    <string>Ctrl+V</string>
+	   </property>
+	  </action>
+  <action name="actionRecenter" >
+   <property name="icon" >
+    <iconset resource="../icons/Input.qrc" >
+     <normaloff>:/cgal/Input/zoom-best-fit</normaloff>:/cgal/Input/zoom-best-fit</iconset>
+   </property>
+   <property name="text" >
+    <string>Redimensionar Diagrama em Viewport</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+R</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="Delaunay_triangulation_2.qrc" />
+  <include location="../icons/File.qrc" />
+  <include location="../resources/CGAL.qrc" />
+  <include location="../icons/Triangulation_2.qrc" />
+  <include location="../icons/Input.qrc" />
+ </resources>
+ <connections/>
+</ui>
