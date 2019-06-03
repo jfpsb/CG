@@ -10,6 +10,7 @@
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 const char* vertexShaderSource = "#version 330 core\n"
 "layout (location = 0) in vec4 vPosition;\n"
@@ -21,7 +22,7 @@ const char* vertexShaderSource = "#version 330 core\n"
 "uniform mat4 oblique;\n"
 "void main()\n"
 "{\n"
-"gl_Position = projection * view * model * oblique * vPosition;\n"
+"gl_Position = projection * view * oblique * model * vPosition;\n"
 "color = vColor;\n"
 "}\0";
 const char* fragmentShaderSource = "#version 330 core\n"
@@ -39,6 +40,8 @@ const float W_WIDTH = 800;
 const float W_HEIGHT = 800;
 
 int projecao = PERSPECTIVA;
+int rodar = 0;
+int estadoAntigo = GLFW_PRESS;
 
 int main()
 {
@@ -55,6 +58,8 @@ int main()
 		glfwTerminate();
 		return -1;
 	}
+
+	glfwSetKeyCallback(window, key_callback);
 
 	glfwMakeContextCurrent(window);
 
@@ -147,7 +152,7 @@ int main()
 		0.3f, 0.0f, 0.5f, 1.0f, // roxo
 		1.0f, 1.0f, 1.0f, 1.0f, // branco
 		1.0f, 1.0f, 0.0f, 1.0f, // amarelo
-		1.0f, 0.6f, 1.0f, 1.0f  // rosa
+		1.0f, 0.2f, 0.0f, 1.0f  // laranja
 	};
 
 
@@ -188,25 +193,31 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// create transformations
-		glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+		// matrizes de transformacao
+		glm::mat4 model = glm::mat4(1.0f);
 		glm::mat4 view = glm::mat4(1.0f);
 		glm::mat4 projection = glm::mat4(1.0f);
 		glm::mat4 oblique = glm::mat4(1.0f);
 
-		view = glm::lookAt(glm::vec3(4.0f, 3.0f, -3.0f), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+		if (rodar == 1) {
+			model = glm::rotate(model, (float)glfwGetTime() * glm::radians(25.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		}
+
+		view = glm::lookAt(glm::vec3(4.0f, 4.0f, 4.0f), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+
 		if (projecao == PERSPECTIVA) {
 			projection = glm::perspective(glm::radians(45.0f), (float)W_WIDTH / (float)W_HEIGHT, 0.1f, 100.0f);
 		}
 		else if(projecao == ORTOGONAL) {
-			projection = glm::ortho(-2.0f, 2.0f, -2.0f, 2.0f, 0.0f, 10.0f);
+			projection = glm::ortho(-2.0f, 2.0f, -2.0f, 2.0f, -4.0f, 10.0f);
 		}
 		else {
-			projection = glm::ortho(-2.0f, 2.0f, -2.0f, 2.0f, 0.0f, 10.0f);
+			view = glm::lookAt(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+			projection = glm::ortho(-2.0f, 2.0f, -2.0f, 2.0f, -4.0f, 10.0f);
 			oblique = glm::mat4(
 				glm::vec4(1.0, 0.0, 0.0, 0.0),
 				glm::vec4(0.0, 1.0, 0.0, 0.0),
-				glm::vec4(0.5, 0.5, 1.0, 0.0),
+				glm::vec4(-0.5, -0.5, 1.0, 0.0),
 				glm::vec4(0.0, 0.0, 0.0, 1.0)
 			);
 		}
@@ -217,18 +228,15 @@ int main()
 		unsigned int viewLoc = glGetUniformLocation(shaderProgram, "view");
 		unsigned int obliqueLoc = glGetUniformLocation(shaderProgram, "oblique");
 
-		// pass them to the shaders (3 different ways)
+		// pass them to the shaders
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
 		glUniformMatrix4fv(obliqueLoc, 1, GL_FALSE, &oblique[0][0]);
-		// note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
-		//ourShader.setMat4("projection", projection);
 		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, &projection[0][0]);
 
-		// draw our first triangle
 		glUseProgram(shaderProgram);
-		glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-		//glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindVertexArray(VAO);
+		//glDrawArrays(GL_TRIANGLES, 0, 6); // Para desenhar triângulo sem BO
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
@@ -237,6 +245,7 @@ int main()
 
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
 
 	glfwTerminate();
 
@@ -250,15 +259,23 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 void processInput(GLFWwindow* window)
 {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
-	if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS)
+	if (key == GLFW_KEY_F1 && action == GLFW_PRESS)
 		projecao = PERSPECTIVA;
 
-	if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS)
+	if (key == GLFW_KEY_F2 && action == GLFW_PRESS)
 		projecao = ORTOGONAL;
 
-	if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS)
+	if (key == GLFW_KEY_F3 && action == GLFW_PRESS)
 		projecao = OBLIQUO;
+
+	if (key == GLFW_KEY_R && action == GLFW_PRESS)
+		rodar = rodar == 0 ? 1 : 0;
 }
