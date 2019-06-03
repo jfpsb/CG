@@ -1,4 +1,4 @@
 ﻿  main.cpp
-C:\Users\jfpsb\Documents\CG\OpenGLCubo\OpenGLCubo\main.cpp(50,49): warning C4244:  'argument': conversion from 'const float' to 'int', possible loss of data
-C:\Users\jfpsb\Documents\CG\OpenGLCubo\OpenGLCubo\main.cpp(50,40): warning C4244:  'argument': conversion from 'const float' to 'int', possible loss of data
+C:\Users\jfpsb\Documents\CG\OpenGLCubo\OpenGLCubo\main.cpp(51,49): warning C4244:  'argument': conversion from 'const float' to 'int', possible loss of data
+C:\Users\jfpsb\Documents\CG\OpenGLCubo\OpenGLCubo\main.cpp(51,40): warning C4244:  'argument': conversion from 'const float' to 'int', possible loss of data
   OpenGLCubo.vcxproj -> C:\Users\jfpsb\Documents\CG\OpenGLCubo\Debug\OpenGLCubo.exe
