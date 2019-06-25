@@ -7,37 +7,18 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "Shader.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
-const char* vertexShaderSource = "#version 330 core\n"
-"layout (location = 0) in vec4 vPosition;\n"
-"layout (location = 1) in vec4 vColor;\n"
-"out vec4 color;\n"
-"uniform mat4 model;\n"
-"uniform mat4 view;\n"
-"uniform mat4 projection;\n"
-"uniform mat4 oblique;\n"
-"void main()\n"
-"{\n"
-"gl_Position = projection * view * oblique * model * vPosition;\n"
-"color = vColor;\n"
-"}\0";
-const char* fragmentShaderSource = "#version 330 core\n"
-"in  vec4 color;\n"
-"void main()\n"
-"{\n"
-"   gl_FragColor = color;\n"
-"}\0";
-
 #define PERSPECTIVA 1
 #define ORTOGONAL 2
 #define OBLIQUO 3
 
-const float W_WIDTH = 800;
-const float W_HEIGHT = 800;
+const int W_WIDTH = 800;
+const int W_HEIGHT = 800;
 
 int projecao = PERSPECTIVA;
 int rodar = 0;
@@ -74,48 +55,7 @@ int main()
 	glViewport(0, 0, 800, 600);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-	// build and compile our shader program
-	// ------------------------------------
-	// vertex shader
-	int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-
-	// check for shader compile errors
-	int success;
-	char infoLog[512];
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-	// fragment shader
-	int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-	// check for shader compile errors
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-
-	// link shaders
-	int shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-
-	// check for linking errors
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-	}
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
+	Shader ourShader("vshader31.glsl", "fshader31.glsl");
 
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
@@ -223,10 +163,10 @@ int main()
 		}
 
 		// retrieve the matrix uniform locations
-		unsigned int projectionLoc = glGetUniformLocation(shaderProgram, "projection");
-		unsigned int modelLoc = glGetUniformLocation(shaderProgram, "model");
-		unsigned int viewLoc = glGetUniformLocation(shaderProgram, "view");
-		unsigned int obliqueLoc = glGetUniformLocation(shaderProgram, "oblique");
+		unsigned int projectionLoc = glGetUniformLocation(ourShader.ID, "projection");
+		unsigned int modelLoc = glGetUniformLocation(ourShader.ID, "model");
+		unsigned int viewLoc = glGetUniformLocation(ourShader.ID, "view");
+		unsigned int obliqueLoc = glGetUniformLocation(ourShader.ID, "oblique");
 
 		// pass them to the shaders
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -234,7 +174,7 @@ int main()
 		glUniformMatrix4fv(obliqueLoc, 1, GL_FALSE, &oblique[0][0]);
 		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, &projection[0][0]);
 
-		glUseProgram(shaderProgram);
+		ourShader.use();
 		glBindVertexArray(VAO);
 		//glDrawArrays(GL_TRIANGLES, 0, 6); // Para desenhar triângulo sem BO
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
