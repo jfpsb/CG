@@ -11,23 +11,13 @@
 #include "Model.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void processInput(GLFWwindow* window);
+void processInput(GLFWwindow* window, glm::mat4 &model, glm::mat4& view);
 
-// settings
+// Dimensões
 const unsigned int SCR_WIDTH = 1200;
 const unsigned int SCR_HEIGHT = 800;
 
-// camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-float lastX = SCR_WIDTH / 2.0f;
-float lastY = SCR_HEIGHT / 2.0f;
-bool firstMouse = true;
-
-// timing
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
+float camera_pos = 3.0f;
 
 int main()
 {
@@ -53,8 +43,6 @@ int main()
 	}
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	glfwSetCursorPosCallback(window, mouse_callback);
-	glfwSetScrollCallback(window, scroll_callback);
 
 	// tell GLFW to capture our mouse
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -77,25 +65,28 @@ int main()
 
 	// load models
 	// -----------
-	Model ourModel("C:/Users/jfpsb/Downloads/Compressed/LearnOpenGL-master/resources/objects/cyborg/cyborg.obj");
-
+	Model ourModel("King George V/King_George_V.obj");
 
 	// draw in wireframe
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	// render loop
 	// -----------
+
+	// Configurações iniciais de MVP. Somente model vai ser alterada no processInput
+	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+	glm::mat4 view = glm::lookAt(glm::vec3(camera_pos, camera_pos, camera_pos), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+	glm::mat4 model = glm::mat4(1.0f);
+	
+	// Rotaciona o modelo para ficar na direção z com proa no sentido z+
+	model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
 	while (!glfwWindowShouldClose(window))
 	{
-		// per-frame time logic
-		// --------------------
-		float currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
-
 		// input
 		// -----
-		processInput(window);
+		processInput(window, model, view);
 
 		// render
 		// ------
@@ -105,16 +96,8 @@ int main()
 		// don't forget to enable shader before setting uniforms
 		ourShader.use();
 
-		// view/projection transformations
-		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		glm::mat4 view = camera.GetViewMatrix();
 		ourShader.setMat4("projection", projection);
 		ourShader.setMat4("view", view);
-
-		// render the loaded model
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f)); // translate it down so it's at the center of the scene
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
 		ourShader.setMat4("model", model);
 		ourModel.Draw(ourShader);
 
@@ -133,19 +116,52 @@ int main()
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow* window)
+void processInput(GLFWwindow* window, glm::mat4 &model, glm::mat4 &view)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camera.ProcessKeyboard(FORWARD, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camera.ProcessKeyboard(BACKWARD, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		camera.ProcessKeyboard(LEFT, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		camera.ProcessKeyboard(RIGHT, deltaTime);
+	// Altera direção Y
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		model = glm::rotate(model, 0.1f * glm::radians(25.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		model = glm::rotate(model, 0.1f * glm::radians(25.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+	}
+
+	// Altera direção X
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		model = glm::rotate(model, 0.1f * glm::radians(25.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		model = glm::rotate(model, 0.1f * glm::radians(25.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	}
+
+	// Altera direção Z
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+		model = glm::rotate(model, 0.1f * glm::radians(25.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+		model = glm::rotate(model, 0.1f * glm::radians(25.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	}
+
+	// Zoom
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+		if (camera_pos > 1.5f) {
+			camera_pos *= 0.99f;
+			view = glm::lookAt(glm::vec3(camera_pos, camera_pos, camera_pos), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+		}
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+		if (camera_pos < 5.0f) {
+			camera_pos *= 1.01f;
+			view = glm::lookAt(glm::vec3(camera_pos, camera_pos, camera_pos), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+		}
+	}
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -155,31 +171,4 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	// make sure the viewport matches the new window dimensions; note that width and 
 	// height will be significantly larger than specified on retina displays.
 	glViewport(0, 0, width, height);
-}
-
-// glfw: whenever the mouse moves, this callback is called
-// -------------------------------------------------------
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
-{
-	if (firstMouse)
-	{
-		lastX = xpos;
-		lastY = ypos;
-		firstMouse = false;
-	}
-
-	float xoffset = xpos - lastX;
-	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-
-	lastX = xpos;
-	lastY = ypos;
-
-	camera.ProcessMouseMovement(xoffset, yoffset);
-}
-
-// glfw: whenever the mouse scroll wheel scrolls, this callback is called
-// ----------------------------------------------------------------------
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-	camera.ProcessMouseScroll(yoffset);
 }

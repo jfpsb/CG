@@ -5,7 +5,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#define STB_IMAGE_IMPLEMENTATION   
+#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -204,6 +204,7 @@ unsigned int TextureFromFile(const char* path, const string& directory, bool gam
 {
 	string filename = string(path);
 	filename = directory + '/' + filename;
+	std::cout << ">>>" + filename << std::endl;
 
 	unsigned int textureID;
 	glGenTextures(1, &textureID);

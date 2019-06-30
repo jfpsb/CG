@@ -1,10 +1,2 @@
 ﻿  OpenGLModeloTextura.cpp
-C:\Users\jfpsb\Documents\CG\OpenGLModeloTextura\OpenGLModeloTextura\OpenGLModeloTextura.cpp(92,22): warning C4244:  'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\jfpsb\Documents\CG\OpenGLModeloTextura\OpenGLModeloTextura\OpenGLModeloTextura.cpp(166,11): warning C4244:  '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\jfpsb\Documents\CG\OpenGLModeloTextura\OpenGLModeloTextura\OpenGLModeloTextura.cpp(167,11): warning C4244:  '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\jfpsb\Documents\CG\OpenGLModeloTextura\OpenGLModeloTextura\OpenGLModeloTextura.cpp(171,16): warning C4244:  'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\jfpsb\Documents\CG\OpenGLModeloTextura\OpenGLModeloTextura\OpenGLModeloTextura.cpp(172,16): warning C4244:  'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\jfpsb\Documents\CG\OpenGLModeloTextura\OpenGLModeloTextura\OpenGLModeloTextura.cpp(174,10): warning C4244:  '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\jfpsb\Documents\CG\OpenGLModeloTextura\OpenGLModeloTextura\OpenGLModeloTextura.cpp(175,10): warning C4244:  '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\jfpsb\Documents\CG\OpenGLModeloTextura\OpenGLModeloTextura\OpenGLModeloTextura.cpp(184,28): warning C4244:  'argument': conversion from 'double' to 'float', possible loss of data
   OpenGLModeloTextura.vcxproj -> C:\Users\jfpsb\Documents\CG\OpenGLModeloTextura\Debug\OpenGLModeloTextura.exe

@@ -166,6 +166,7 @@
   <ItemGroup>
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Shader.h" />
   </ItemGroup>
   <ItemGroup>
