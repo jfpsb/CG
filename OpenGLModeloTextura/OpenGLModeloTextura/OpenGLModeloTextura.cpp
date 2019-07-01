@@ -17,7 +17,7 @@ void processInput(GLFWwindow* window, glm::mat4 &model, glm::mat4& view);
 const unsigned int SCR_WIDTH = 1200;
 const unsigned int SCR_HEIGHT = 800;
 
-float camera_pos = 5.0f;
+float camera_pos = 3.0f;
 
 int main()
 {
@@ -62,12 +62,10 @@ int main()
 	// load models
 	// -----------
 	Model ourModel("King George V/King_George_V.obj");
-	//"C:/Users/jfpsb/Downloads/Compressed/LearnOpenGL-master/resources/objects/cyborg/cyborg.obj"
-	//"King George V/King_George_V.obj"
 
 	// lighting info
 	// -------------
-	glm::vec3 lightPos(0.0f, 1.0f, 1.0f);
+	glm::vec3 lightPos(1.0f, 1.0f, 1.0f);
 
 	// draw in wireframe
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -101,7 +99,7 @@ int main()
 		ourShader.setMat4("projection", projection);
 		ourShader.setMat4("view", view);
 		ourShader.setMat4("model", model);
-		ourShader.setVec3("viewPos", glm::vec3(1.0f));
+		ourShader.setVec3("viewPos", glm::vec3(camera_pos));
 		ourShader.setVec3("lightPos", lightPos);
 		ourModel.Draw(ourShader);
 
@@ -127,42 +125,42 @@ void processInput(GLFWwindow* window, glm::mat4 &model, glm::mat4 &view)
 
 	// Altera direção Y
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		model = glm::rotate(model, 0.1f * glm::radians(25.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, 0.05f * glm::radians(25.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		model = glm::rotate(model, 0.1f * glm::radians(25.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+		model = glm::rotate(model, 0.05f * glm::radians(25.0f), glm::vec3(0.0f, -1.0f, 0.0f));
 	}
 
 	// Altera direção X
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		model = glm::rotate(model, 0.1f * glm::radians(25.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, 0.05f * glm::radians(25.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		model = glm::rotate(model, 0.1f * glm::radians(25.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, 0.05f * glm::radians(25.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	}
 
 	// Altera direção Z
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-		model = glm::rotate(model, 0.1f * glm::radians(25.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+		model = glm::rotate(model, 0.05f * glm::radians(25.0f), glm::vec3(0.0f, 0.0f, -1.0f));
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-		model = glm::rotate(model, 0.1f * glm::radians(25.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, 0.05f * glm::radians(25.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	}
 
 	// Zoom
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-		if (camera_pos > 0.5f) {
-			camera_pos *= 0.99f;
+		if (camera_pos > 1.5f) {
+			camera_pos *= 0.995f;
 			view = glm::lookAt(glm::vec3(camera_pos, camera_pos, camera_pos), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 		}
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
 		if (camera_pos < 5.0f) {
-			camera_pos *= 1.01f;
+			camera_pos *= 1.005f;
 			view = glm::lookAt(glm::vec3(camera_pos, camera_pos, camera_pos), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 		}
 	}
