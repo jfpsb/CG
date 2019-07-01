@@ -230,6 +230,8 @@ unsigned int TextureFromFile(const char* path, const string& directory, bool gam
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+		glDisable(GL_TEXTURE_2D);
+
 		stbi_image_free(data);
 	}
 	else

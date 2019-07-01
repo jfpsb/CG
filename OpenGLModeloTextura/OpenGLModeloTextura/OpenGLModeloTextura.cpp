@@ -17,7 +17,7 @@ void processInput(GLFWwindow* window, glm::mat4 &model, glm::mat4& view);
 const unsigned int SCR_WIDTH = 1200;
 const unsigned int SCR_HEIGHT = 800;
 
-float camera_pos = 3.0f;
+float camera_pos = 5.0f;
 
 int main()
 {
@@ -27,10 +27,6 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-#ifdef __APPLE__
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // uncomment this statement to fix compilation on OS X
-#endif
 
 	// glfw window creation
 	// --------------------
@@ -66,6 +62,12 @@ int main()
 	// load models
 	// -----------
 	Model ourModel("King George V/King_George_V.obj");
+	//"C:/Users/jfpsb/Downloads/Compressed/LearnOpenGL-master/resources/objects/cyborg/cyborg.obj"
+	//"King George V/King_George_V.obj"
+
+	// lighting info
+	// -------------
+	glm::vec3 lightPos(0.0f, 1.0f, 1.0f);
 
 	// draw in wireframe
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -90,7 +92,7 @@ int main()
 
 		// render
 		// ------
-		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
+		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// don't forget to enable shader before setting uniforms
@@ -99,6 +101,8 @@ int main()
 		ourShader.setMat4("projection", projection);
 		ourShader.setMat4("view", view);
 		ourShader.setMat4("model", model);
+		ourShader.setVec3("viewPos", glm::vec3(1.0f));
+		ourShader.setVec3("lightPos", lightPos);
 		ourModel.Draw(ourShader);
 
 
@@ -150,7 +154,7 @@ void processInput(GLFWwindow* window, glm::mat4 &model, glm::mat4 &view)
 
 	// Zoom
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-		if (camera_pos > 1.5f) {
+		if (camera_pos > 0.5f) {
 			camera_pos *= 0.99f;
 			view = glm::lookAt(glm::vec3(camera_pos, camera_pos, camera_pos), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 		}
