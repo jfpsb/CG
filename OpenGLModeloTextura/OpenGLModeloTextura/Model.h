@@ -195,6 +195,7 @@ private:
 				textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
 			}
 		}
+
 		return textures;
 	}
 };
@@ -204,7 +205,6 @@ unsigned int TextureFromFile(const char* path, const string& directory, bool gam
 {
 	string filename = string(path);
 	filename = directory + '/' + filename;
-	std::cout << ">>>" + filename << std::endl;
 
 	unsigned int textureID;
 	glGenTextures(1, &textureID);
@@ -229,8 +229,6 @@ unsigned int TextureFromFile(const char* path, const string& directory, bool gam
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		glDisable(GL_TEXTURE_2D);
 
 		stbi_image_free(data);
 	}

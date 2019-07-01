@@ -14,5 +14,4 @@ newmtl _King_George_V
 	Ke 0.0000 0.0000 0.0000
 	map_Ka King_George_V.jpg
 	map_Kd King_George_V.jpg
-	map_bump King_George_V_bump.jpg
-	bump King_George_V_bump.jpg
+	map_Bump King_George_V_bump.jpg
