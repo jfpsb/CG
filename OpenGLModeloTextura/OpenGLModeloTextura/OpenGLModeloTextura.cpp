@@ -63,6 +63,12 @@ int main()
 	// -----------
 	Model ourModel("King George V/King_George_V.obj");
 
+	// shader configuration
+	// --------------------
+	ourShader.use();
+	ourShader.setInt("diffuseMap", 0);
+	ourShader.setInt("normalMap", 1);
+
 	// lighting info
 	// -------------
 	glm::vec3 lightPos(1.0f, 1.0f, 1.0f);
@@ -95,7 +101,6 @@ int main()
 
 		// don't forget to enable shader before setting uniforms
 		ourShader.use();
-
 		ourShader.setMat4("projection", projection);
 		ourShader.setMat4("view", view);
 		ourShader.setMat4("model", model);
@@ -152,7 +157,7 @@ void processInput(GLFWwindow* window, glm::mat4 &model, glm::mat4 &view)
 
 	// Zoom
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-		if (camera_pos > 1.5f) {
+		if (camera_pos > 1.0f) {
 			camera_pos *= 0.995f;
 			view = glm::lookAt(glm::vec3(camera_pos, camera_pos, camera_pos), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 		}
