@@ -186,15 +186,8 @@ int main(int argc, char** argv) {
 
 	Mesh mesh = loadFromObj("LowPolyTree.obj");
 
-	/*vector<Face> new_faces;
-
-	for (Face face : mesh.faces) {
-		if (face.vnormals[0].z < 0) {
-			new_faces.push_back(face);
-		}
-	}
-
-	mesh.faces = new_faces;*/
+	cout << "O modelo possui " << mesh.vertices.size() << " vértices e " << mesh.faces.size() << " faces." << endl;
+	cout << "Aguarde" << endl;
 
 	double colunas = 180;
 	double linhas = 320;
@@ -226,23 +219,27 @@ int main(int argc, char** argv) {
 				Vetor3 v1v0 = face.vertices[1] - face.vertices[0];
 				Vetor3 v2v0 = face.vertices[2] - face.vertices[0];
 
+				//Normal do plano
 				Vetor3 N = (v1v0 * v2v0).normalizar();
 
+				//Produto escalar entre normal do plano e direcao
 				double NdotP = N.produtoEscalar(raio.d);
 
 				if (NdotP == 0)
 					continue;
 
+				// Achando d através da normal e um vértice do plano
 				double d = N.produtoEscalar(face.vertices[0]);
 
-				// compute t (equation 3)
+				// Encontrando t (distância de COP até interseção)
 				double t = (d - N.produtoEscalar(raio.o)) / NdotP;
-				// check if the triangle is in behind the ray
-				if (t < 0) continue; // the triangle is behind 
+				
+				if (t < 0) continue; // Se a face estiver atrás de COP, não a fazer
 
-				//Vetor3 P = raio.o + (raio.d * t);
 				Vetor3 P(raio.o.x + t * raio.d.x, raio.o.y + t * raio.d.y, raio.o.z + t * raio.d.z);
 
+				// Soma dos ângulos de cada vértice usando o ponto de interseção como origem
+				// 359º ou 360º confirmam que ponto está dentro da superfície
 				int v_size = face.vertices.size();
 				double ang = 0;
 
@@ -255,9 +252,6 @@ int main(int argc, char** argv) {
 					ang += v1.angulo(v2);
 				}
 
-				//if (fabs(ang) == 0)
-					//continue;
-
 				if (fabs(ang - 360) <= 1) {
 					if (t < tNear) {
 						tNear = t;
@@ -267,12 +261,13 @@ int main(int argc, char** argv) {
 				}
 			}
 
+			// Se ponto está fora, imprimir preto na imagem
 			if (tNear == INFINITY) {
 				ofs << "0" << " 0 " << "0" << endl;
 			}
-			else {
-				Vetor3 L = ponto - Vetor3(1, 1, 3);
-				Vetor3 E = raio.o - ponto;
+			else { // Cálculo de cor do pixel
+				Vetor3 L = ponto - Vetor3(1, 1, 3); // Direção da luz ao ponto
+				Vetor3 E = raio.o - ponto; // Direção de COP até o ponto de interseção
 				Vetor3 H = L - E;
 				int I = 200;
 				int red = 0;
