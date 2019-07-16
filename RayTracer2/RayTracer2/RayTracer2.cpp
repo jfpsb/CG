@@ -40,6 +40,10 @@ public:
 		return Vetor3(x - v.x, y - v.y, z - v.z);
 	}
 
+	Vetor3 operator * (double d) {
+		return Vetor3(x * d, y * d, z * d);
+	}
+
 	//Produto Vetorial
 	Vetor3 operator * (Vetor3 v) {
 		return Vetor3((y * v.z) - (v.y * z), (z * v.x) - (v.z * x), (x * v.y) - (v.x * y));
@@ -141,8 +145,10 @@ Mesh loadFromObj(string filepath) {
 					face.vertices.push_back(mesh.vertices[v_index]);
 
 					if (splitf.size() >= 2) {
-						t_index = atoi(splitf[1].c_str()) - 1;
-						face.vtexturas.push_back(mesh.textures[t_index]);
+						if (!splitf[1].empty()) {
+							t_index = atoi(splitf[1].c_str()) - 1;
+							face.vtexturas.push_back(mesh.textures[t_index]);
+						}
 					}
 
 					if (splitf.size() == 3) {
@@ -178,7 +184,7 @@ void clamp255(Vetor3& col) {
 
 int main(int argc, char** argv) {
 
-	Mesh mesh = loadFromObj("Crate.obj");
+	Mesh mesh = loadFromObj("LowPolyTree.obj");
 
 	/*vector<Face> new_faces;
 
@@ -190,24 +196,18 @@ int main(int argc, char** argv) {
 
 	mesh.faces = new_faces;*/
 
-	double colunas = 200;
-	double linhas = 200;
+	double colunas = 180;
+	double linhas = 320;
 
-	Vetor3 COP(0, 0, -5);
+	Vetor3 COP(0, 1, -3);
 
-	double xmin = -2;
-	double ymin = -2;
-	double xmax = 2;
+	double xmin = -1;
+	double ymin = -1;
+	double xmax = 1;
 	double ymax = 2;
 
 	double width = (xmax - xmin) / colunas;
 	double height = (ymax - ymin) / linhas;
-
-	Vetor3 luzAmbiente(2);
-	Vetor3 ka(0);
-	Vetor3 kd(0.64);
-	Vetor3 ks(0.5);
-	int m = 10;
 
 	// Save result to a PPM image (keep these flags if you compile under Windows)
 	std::ofstream ofs("./out.ppm", std::ios::out | std::ios::binary);
@@ -218,9 +218,9 @@ int main(int argc, char** argv) {
 			double tNear = INFINITY;
 			double x = xmin + (width * (j + 0.5));
 			double y = ymax - (height * (i + 0.5));
-			Vetor3 ponto;
+			Vetor3 N2, ponto;
 
-			Raio raio(COP, (Vetor3(x, y, 0) - COP).normalizar());
+			Raio raio(COP, (Vetor3(x, y, -1) - COP).normalizar());
 
 			for (Face face : mesh.faces) {
 				Vetor3 v1v0 = face.vertices[1] - face.vertices[0];
@@ -230,13 +230,13 @@ int main(int argc, char** argv) {
 
 				double NdotP = N.produtoEscalar(raio.d);
 
-				if (fabs(NdotP) < 0.00001)
+				if (NdotP == 0)
 					continue;
 
 				double d = N.produtoEscalar(face.vertices[0]);
 
 				// compute t (equation 3)
-				double t = (N.produtoEscalar(raio.o) + d) / NdotP;
+				double t = (d - N.produtoEscalar(raio.o)) / NdotP;
 				// check if the triangle is in behind the ray
 				if (t < 0) continue; // the triangle is behind 
 
@@ -255,25 +255,33 @@ int main(int argc, char** argv) {
 					ang += v1.angulo(v2);
 				}
 
-				if (fabs(ang) == 0)
-					continue;
+				//if (fabs(ang) == 0)
+					//continue;
 
-				if (ang == 360) {
+				if (fabs(ang - 360) <= 1) {
 					if (t < tNear) {
 						tNear = t;
+						N2 = N;
 						ponto = P;
 					}
 				}
 			}
 
 			if (tNear == INFINITY) {
-				ofs << "255" << " 255 " << "255" << endl;
-
+				ofs << "0" << " 0 " << "0" << endl;
 			}
 			else {
-				ofs << "0" << " 0 " << "0" << endl;
+				Vetor3 L = ponto - Vetor3(1, 1, 3);
+				Vetor3 E = raio.o - ponto;
+				Vetor3 H = L - E;
+				int I = 200;
+				int red = 0;
+				int green = 0.3 * I + I * (0.3 * (N2.produtoEscalar(L.normalizar())) + 1 * pow(N2.produtoEscalar(H.normalizar()), 4));
+				int blue = 0;
 
-
+				ofs << red << ' '
+					<< green << ' '
+					<< blue << '\n';
 			}
 		}
 	}
